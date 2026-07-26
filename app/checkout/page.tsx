@@ -1,14 +1,40 @@
 "use client";
-
+import { db } from "../lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { useAuth } from "../context/AuthContext";
 import { useCart } from "../hooks/useCart";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 export default function CheckoutPage() {
+  const { user } = useAuth();
   const router = useRouter();
   const { cart, totalItems, totalPrice,clearCart } = useCart();
-const handlePlaceOrder = () => {
-  clearCart();
-  router.push("/success");
+const handlePlaceOrder = async () => {
+  try {
+   
+    await addDoc(collection(db, "orders"), {
+  userId: user?.uid,
+  email: user?.email,
+
+  products: cart,
+
+  totalItems,
+  totalPrice,
+
+  status: "Pending",
+
+  createdAt: serverTimestamp(),
+});
+
+    clearCart();
+
+    router.push("/success");
+
+  } catch (error) {
+    console.error(error);
+
+    alert("Order Failed!");
+  }
 };
   return (
     <div className="max-w-5xl mx-auto p-10">
@@ -40,12 +66,58 @@ const handlePlaceOrder = () => {
             placeholder="Phone Number"
             className="w-full border p-3 rounded mb-4"
           />
+          <input
+            type="text"
+            placeholder="City"
+            className="w-full border p-3 rounded mb-4"
+          />
 
+          <input
+            type="text"
+            placeholder="Postal Code"
+            className="w-full border p-3 rounded mb-4"
+          />
+
+          <input
+            type="text"
+            placeholder="Country"
+            className="w-full border p-3 rounded mb-4"
+          />
           <textarea
             placeholder="Shipping Address"
             className="w-full border p-3 rounded"
             rows={4}
           />
+          <div className="mt-6">
+  <h3 className="text-lg font-bold mb-3">
+    Payment Method
+  </h3>
+
+  <label className="flex items-center gap-2 mb-2">
+    <input
+      type="radio"
+      name="payment"
+      defaultChecked
+    />
+    Cash on Delivery
+  </label>
+
+  <label className="flex items-center gap-2 mb-2">
+    <input
+      type="radio"
+      name="payment"
+    />
+    Credit Card
+  </label>
+
+  <label className="flex items-center gap-2">
+    <input
+      type="radio"
+      name="payment"
+    />
+    Debit Card
+  </label>
+</div>
         </div>
 
         {/* Order Summary */}

@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { updateProfile } from "firebase/auth";
+import Link from "next/link";
 export default function AccountPage() {
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -116,6 +117,7 @@ if (!user) {
     </p>
   </div>
 
+ <Link href="/orders">
   <div className="border rounded-xl p-6 hover:shadow-lg transition cursor-pointer">
     📦
     <h3 className="text-xl font-bold mt-4">
@@ -126,6 +128,7 @@ if (!user) {
       Track all your orders.
     </p>
   </div>
+</Link>
 
   <div className="border rounded-xl p-6 hover:shadow-lg transition cursor-pointer">
     ⚙️

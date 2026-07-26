@@ -1,0 +1,136 @@
+"use client";
+
+import Navbar from "../../../components/Navbar";
+import Footer from "../../../components/Footer";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../../lib/firebase";
+import { updateDoc } from "firebase/firestore";
+
+export default function AdminOrderDetailsPage() {
+    const { id } = useParams();
+
+const [order, setOrder] = useState<any>(null);
+const [loading, setLoading] = useState(true);
+useEffect(() => {
+  const fetchOrder = async () => {
+    try {
+      const docRef = doc(db, "orders", id as string);
+
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setOrder({
+          id: docSnap.id,
+          ...docSnap.data(),
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    setLoading(false);
+  };
+
+  fetchOrder();
+}, [id]);
+const updateStatus = async (status: string) => {
+  if (!order) return;
+
+  try {
+    const orderRef = doc(db, "orders", order.id);
+
+    await updateDoc(orderRef, {
+      status,
+    });
+
+    setOrder({
+      ...order,
+      status,
+    });
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+  return (
+    <>
+      <Navbar />
+
+      <div className="max-w-7xl mx-auto p-10">
+
+        <h1 className="text-4xl font-bold text-pink-600 mb-8">
+          Order Details
+        </h1>
+
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+
+          {loading ? (
+  <p className="text-gray-500">Loading Order...</p>
+) : order ? (
+  <div className="space-y-6">
+
+    <div>
+      <h2 className="text-2xl font-bold">
+        Order #{order.id.slice(0, 8)}
+      </h2>
+
+      <p className="text-gray-500 mt-2">
+        Customer: {order.email}
+      </p>
+
+      <p className="text-pink-600 font-bold mt-2">
+        Total: ${order.totalPrice.toFixed(2)}
+      </p>
+
+      <p className="text-gray-600">
+        Total Items: {order.totalItems}
+      </p>
+
+      <p className="mt-2">
+        Status:
+        <span className="ml-2 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full">
+          {order.status}
+        </span>
+        </p>
+        <div className="flex gap-3 mt-6">
+
+  <button
+    onClick={() => updateStatus("Processing")}
+    className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+  >
+    Processing
+  </button>
+
+  <button
+    onClick={() => updateStatus("Shipped")}
+    className="bg-green-600 text-white px-4 py-2 rounded-lg"
+  >
+    Shipped
+  </button>
+
+  <button
+    onClick={() => updateStatus("Delivered")}
+    className="bg-purple-600 text-white px-4 py-2 rounded-lg"
+  >
+    Delivered
+  </button>
+
+</div>
+      
+    </div>
+
+  </div>
+) : (
+  <p>Order not found.</p>
+)}
+
+        </div>
+
+      </div>
+
+      <Footer />
+    </>
+  );
+}
