@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
+import AdminSidebar from "../../components/AdminSidebar";
 
 export default function AdminProductsPage() {
   const { user, loading } = useAuth();
@@ -76,7 +77,13 @@ return (
     <>
       <Navbar />
 
-      <div className="max-w-7xl mx-auto p-10">
+       <div className="max-w-7xl mx-auto p-10">
+
+  <div className="flex gap-8">
+
+    <AdminSidebar />
+
+    <div className="flex-1">
 
         <div className="flex justify-between items-center mb-8">
 
@@ -231,7 +238,8 @@ return (
         </div>
 
       </div>
-
+</div>
+</div>
       <Footer />
     </>
   );

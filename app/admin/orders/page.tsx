@@ -14,28 +14,30 @@ import { db } from "../../lib/firebase";
 import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
+import AdminSidebar from "../../components/AdminSidebar";
 
 
 export default function AdminOrdersPage() {
 
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+
 const router = useRouter();
     const [orders, setOrders] = useState<any[]>([]);
-const [productsLoading, setProductsLoading] = useState(true);
+const [ordersLoading, setOrdersLoading] = useState(true);
 const ADMIN_EMAIL = "azaanshehroz4@gmail.com";
 
 useEffect(() => {
-  if (loading) return;
+  if (authLoading) return;
 
   if (!user) {
-    router.push("/login?redirect=/admin/products");
+    router.push("/login?redirect=/admin/orders");
     return;
   }
 
   if (user.email !== ADMIN_EMAIL) {
     router.push("/");
   }
-}, [user, loading, router]);
+}, [user, authLoading, router]);
 useEffect(() => {
   const fetchOrders = async () => {
     try {
@@ -56,7 +58,7 @@ useEffect(() => {
       console.error(error);
     }
 
-    setProductsLoading(false);
+    setOrdersLoading(false);
   };
 
   fetchOrders();
@@ -66,12 +68,18 @@ useEffect(() => {
       <Navbar />
 
       <div className="max-w-7xl mx-auto p-10">
+
+  <div className="flex gap-8">
+
+    <AdminSidebar />
+
+    <div className="flex-1">
         <h1 className="text-4xl font-bold text-pink-600 mb-8">
           Manage Orders
         </h1>
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
-         {loading ? (
+         {ordersLoading ? (
   <p className="text-gray-500">Loading Orders...</p>
 ) : (
   <div className="overflow-x-auto">
@@ -152,7 +160,8 @@ useEffect(() => {
 )}
         </div>
       </div>
-
+</div>
+ </div>
       <Footer />
     </>
   );

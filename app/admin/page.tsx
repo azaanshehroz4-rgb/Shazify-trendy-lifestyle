@@ -7,6 +7,10 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
+import AdminSidebar from "../components/AdminSidebar";
+import AdminStats from "../components/AdminStats";
+import RecentOrders from "../components/RecentOrders";
+import QuickActions from "../components/QuickActions";
 
 export default function AdminPage() {
   
@@ -82,16 +86,23 @@ return (
 
       <div className="max-w-7xl mx-auto p-10">
 
+  <div className="flex gap-8">
+
+    <AdminSidebar />
+
+    <div className="flex-1">
+
         <h1 className="text-4xl font-bold text-pink-600 mb-8">
           Admin Dashboard
         </h1>
 
-        <div className="grid md:grid-cols-4 gap-6">
-
-          <div className="bg-pink-600 text-white rounded-xl p-6 shadow">
-            <h2 className="text-lg">Total Orders</h2>
-            <p className="text-4xl font-bold mt-4"> {loading ? "..." : orders.length}</p>
-          </div>
+       <AdminStats
+  totalOrders={orders.length}
+  totalRevenue={totalRevenue}
+  customers={customers}
+  pendingOrders={pendingOrders}
+  totalProducts={totalProducts}
+/>
 
           <div className="bg-green-600 text-white rounded-xl p-6 shadow">
             <h2 className="text-lg">Total Revenue</h2>
@@ -121,112 +132,17 @@ return (
     {totalProducts}
   </p>
 </div>
-<div className="mt-12 bg-white rounded-2xl shadow-lg p-8">
 
-  <h2 className="text-2xl font-bold mb-6">
-    Recent Orders
-  </h2>
+<RecentOrders orders={orders} />
+<QuickActions />
 
-  <div className="overflow-x-auto">
-
-    <table className="w-full">
-
-      <thead className="border-b">
-
-        <tr>
-          <th className="text-left py-3">Customer</th>
-          <th className="text-left py-3">Items</th>
-          <th className="text-left py-3">Total</th>
-          <th className="text-left py-3">Status</th>
-        </tr>
-
-      </thead>
-
-      <tbody>
-
-        {orders.slice(0, 5).map((order: any) => (
-
-          <tr
-            key={order.id}
-            className="border-b hover:bg-gray-50"
-          >
-
-            <td className="py-4">
-              {order.email}
-            </td>
-
-            <td>
-              {order.totalItems}
-            </td>
-
-            <td className="text-pink-600 font-bold">
-              ${order.totalPrice.toFixed(2)}
-            </td>
-
-            <td>
-              {order.status}
-            </td>
-
-          </tr>
-
-        ))}
-
-      </tbody>
-
-    </table>
-
-  </div>
-
-</div>
-<div className="mt-10 bg-white rounded-2xl shadow-lg p-8">
-
-  <h2 className="text-2xl font-bold mb-6">
-    Quick Actions
-  </h2>
-
-  <div className="grid md:grid-cols-4 gap-6">
-
-    <a
-      href="/admin/products"
-      className="bg-pink-600 text-white rounded-xl p-6 text-center hover:bg-pink-700 transition"
-    >
-      📦
-      <p className="mt-3 font-bold">Manage Products</p>
-    </a>
-
-    <a
-      href="/admin/orders"
-      className="bg-blue-600 text-white rounded-xl p-6 text-center hover:bg-blue-700 transition"
-    >
-      📋
-      <p className="mt-3 font-bold">Manage Orders</p>
-    </a>
-
-    <a
-      href="/admin/reviews"
-      className="bg-green-600 text-white rounded-xl p-6 text-center hover:bg-green-700 transition"
-    >
-      ⭐
-      <p className="mt-3 font-bold">Manage Reviews</p>
-    </a>
-
-    <a
-      href="/"
-      className="bg-purple-600 text-white rounded-xl p-6 text-center hover:bg-purple-700 transition"
-    >
-      🌐
-      <p className="mt-3 font-bold">Visit Store</p>
-    </a>
-
-  </div>
-
-</div>
-
+        </div>
         </div>
 
       </div>
-
+ 
       <Footer />
-    </div>
+ 
+     </div>
   );
 }
