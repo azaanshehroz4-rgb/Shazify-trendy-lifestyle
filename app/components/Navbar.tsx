@@ -80,13 +80,23 @@ const router = useRouter();
     >
       My Account
     </Link>
+    {user.email === "azaanshehroz4@gmail.com" && (
+  <Link
+    href="/admin"
+    className="hover:text-yellow-300 transition"
+  >
+    Admin Dashboard
+  </Link>
+)}
 
     <button
       onClick={async () => {
         await logout();
         router.push("/");
       }}
+      
       className="hover:text-yellow-300 transition"
+      
     >
       Logout
     </button>

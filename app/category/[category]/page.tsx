@@ -1,14 +1,22 @@
 import Link from "next/link";
 import Image from "next/image";
-import products from "../../data/products";
+import { db } from "../../lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
 export default async function CategoryPage({
   params,
 }: {
   params: Promise<{ category: string }>;
 }) {
   const { category } = await params;
-  const filteredProducts = products.filter(
-  (product) =>
+  const snapshot = await getDocs(collection(db, "products"));
+
+const products: any[] = snapshot.docs.map((doc) => ({
+  id: doc.id,
+  ...doc.data(),
+}));
+
+const filteredProducts = products.filter(
+  (product: any) =>
     product.category.toLowerCase() === category.toLowerCase()
 );
  return (

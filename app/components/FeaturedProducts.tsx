@@ -2,12 +2,15 @@
 
 import Image from "next/image";
 import { Heart, Eye, ShoppingCart, Star } from "lucide-react";
-import products from "../data/products";
+import { useState, useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../lib/firebase";
 import { useCart } from "../hooks/useCart";
 import { useSearch } from "../context/SearchContext";
 import { useWishlist } from "../context/WishlistContext";
 import Link from "next/link";
 export default function FeaturedProducts() {
+  const [products, setProducts] = useState<any[]>([]);
    const { addToCart } = useCart()
    const {
   addToWishlist,
@@ -26,7 +29,25 @@ const handleWishlist = (product: any) => {
     addToWishlist(product);
   }
 };
-  const filteredProducts = products.filter((product) =>
+  useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "products"));
+
+      const productsData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setProducts(productsData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  fetchProducts();
+}, []);
+const filteredProducts = products.filter((product) =>
   product.name.toLowerCase().includes(search.toLowerCase())
 );
 return (
@@ -47,6 +68,18 @@ return (
       </div>
 
       {/* Product Grid */}
+      {filteredProducts.length === 0 && (
+  <div className="text-center py-20">
+    <h2 className="text-3xl font-bold text-gray-600">
+      No Products Found
+    </h2>
+
+    <p className="text-gray-500 mt-4">
+      Try searching with another keyword.
+    </p>
+  </div>
+      )}
+      {filteredProducts.length > 0 && (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {filteredProducts.map((product) => (
           <div
@@ -145,6 +178,7 @@ return (
           </div>
         ))}
       </div>
+      )}
     </section>
   );
 }

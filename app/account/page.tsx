@@ -105,7 +105,7 @@ if (!user) {
           </p>
 
          <div className="grid md:grid-cols-2 gap-6 mt-10">
-
+<Link href="/wishlist">
   <div className="border rounded-xl p-6 hover:shadow-lg transition cursor-pointer">
     ❤️
     <h3 className="text-xl font-bold mt-4">
@@ -116,8 +116,9 @@ if (!user) {
       View your saved products.
     </p>
   </div>
+</Link>
 
- <Link href="/orders">
+ <Link href="/account/orders">
   <div className="border rounded-xl p-6 hover:shadow-lg transition cursor-pointer">
     📦
     <h3 className="text-xl font-bold mt-4">

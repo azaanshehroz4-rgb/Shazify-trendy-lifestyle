@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
+
 import Image from "next/image";
 import { Minus, Plus, Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../../hooks/useCart";
 import { useWishlist } from "../../context/WishlistContext";
 import Link from "next/link";
-import products from "../../data/products";
+
+import { useState, useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import { useRecentlyViewed } from "../../context/RecentlyViewedContext";
 
 export default function ProductDetails({
   product,
@@ -18,12 +22,50 @@ export default function ProductDetails({
 
   const { addToCart } = useCart();
   const { addToWishlist, isInWishlist } = useWishlist();
+  const {
+  recentlyViewed,
+  addRecentlyViewed,
+} = useRecentlyViewed();
   const router = useRouter();
-  const relatedProducts = products.filter(
-  (item) =>
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
+  
+  useEffect(() => {
+  const fetchRelatedProducts = async () => {
+    
+    const reviewSnapshot = await getDocs(collection(db, "reviews"));
+
+const reviewData = reviewSnapshot.docs
+  .map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }))
+  .filter((review: any) => review.productId === product.id);
+
+setReviews(reviewData);
+    const snapshot = await getDocs(collection(db, "products"));
+
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    const filtered = data.filter((item: any) => {
+  return (
     item.category === product.category &&
-    item.id !== product.id
-);
+    item.id !== product.id &&
+    item.stock > 0
+  );
+});
+
+    setRelatedProducts(filtered);
+  };
+
+  fetchRelatedProducts();
+}, [product]);
+useEffect(() => {
+  addRecentlyViewed(product);
+}, [product]);
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
       addToCart(product);
@@ -130,32 +172,50 @@ export default function ProductDetails({
               Buy Now
             </button>
 
-            <div className="mt-8 space-y-3 border-t pt-6">
+            
 
-              <p className="text-green-600 font-semibold">
-                ✅ In Stock
-              </p>
+              <div className="mt-8 space-y-3 border-t pt-6">
 
-              <p className="text-gray-600">
-                🚚 Free Shipping on orders over $50
-              </p>
+  {product.stock === 0 ? (
+    <p className="text-red-600 font-semibold">
+      ❌ Out of Stock
+    </p>
+  ) : product.stock <= 5 ? (
+    <p className="text-yellow-600 font-semibold">
+      ⚠️ {product.stock} Low Stock
+    </p>
+  ) : (
+    <p className="text-green-600 font-semibold">
+      ✅ {product.stock} In Stock
+    </p>
+  )}
 
-              <p className="text-gray-600">
-                🔒 100% Secure Checkout
-              </p>
+  <p className="text-gray-600">
+    🚚 Free Shipping on orders over $50
+  </p>
 
-              <p className="text-gray-600">
-                ↩️ Easy 30-Day Returns
-              </p>
+  <p className="text-gray-600">
+    🔒 100% Secure Checkout
+  </p>
+
+  <p className="text-gray-600">
+    ↩️ Easy 3-Day Returns
+  </p>
+
+</div>
+                
+              
+
+              
                   {/* Customer Reviews */}
 <div className="mt-12">
   <h2 className="text-2xl font-bold mb-6">
     Customer Reviews
   </h2>
 
-  {product.reviews?.length > 0 ? (
+  {reviews.length > 0 ? (
     <div className="space-y-6">
-      {product.reviews.map((review: any) => (
+      {reviews.map((review: any) => (
         <div
           key={review.id}
           className="border rounded-xl p-5 shadow-sm"
@@ -192,7 +252,9 @@ export default function ProductDetails({
     Related Products
   </h2>
 
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+  {relatedProducts.length > 0 ? (
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
     {relatedProducts.map((item) => (
       <Link
         key={item.id}
@@ -212,12 +274,69 @@ export default function ProductDetails({
 
           <p className="text-pink-600 font-bold mt-2">
             ${item.price}
+
           </p>
         </div>
       </Link>
     ))}
   </div>
+   ) : (
+    <p className="text-gray-500">
+      No related products found.
+    </p>
+  )}
+
 </div>
+<div className="mt-16">
+  <h2 className="text-3xl font-bold mb-8">
+    Recently Viewed
+  </h2>
+
+  {recentlyViewed.length > 0 ? (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+      {recentlyViewed
+        .filter((item: any) => item.id !== product.id)
+        .map((item: any) => (
+
+          <Link
+            key={item.id}
+            href={`/product/${item.id}`}
+            className="border rounded-xl overflow-hidden shadow hover:shadow-lg transition"
+          >
+
+            <Image
+              src={item.image}
+              alt={item.name}
+              width={300}
+              height={250}
+              className="w-full h-56 object-cover"
+            />
+
+            <div className="p-4">
+
+              <h3 className="font-bold">
+                {item.name}
+              </h3>
+
+              <p className="text-pink-600 font-bold mt-2">
+                ${item.price}
+              </p>
+
+            </div>
+
+          </Link>
+
+      ))}
+
+    </div>
+  ) : (
+    <p className="text-gray-500">
+      No recently viewed products.
+    </p>
+  )}
+</div>
+  
             </div>
 
           </div>
@@ -225,6 +344,7 @@ export default function ProductDetails({
         </div>
 
       </div>
-    </div>
+        
+    
   );
 }

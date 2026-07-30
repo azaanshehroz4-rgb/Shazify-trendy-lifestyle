@@ -1,11 +1,19 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import products from "../data/products";
+
 import Image from "next/image";
 import Link from "next/link";
+import { db } from "../lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
-export default function DealsPage() {
-  return (
+export default async function DealsPage() {
+  const snapshot = await getDocs(collection(db, "products"));
+
+   const products = snapshot.docs.map((doc) => ({
+       id: doc.id,
+      ...doc.data(),
+     }));
+    return (
     <>
       <Navbar />
 
@@ -21,7 +29,7 @@ export default function DealsPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
 
-          {products.map((product) => (
+          {products.map((product: any) => (
             <Link
               key={product.id}
               href={`/product/${product.id}`}

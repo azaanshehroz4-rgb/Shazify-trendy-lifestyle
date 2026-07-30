@@ -5,6 +5,7 @@ import { CartProvider } from "./context/CartContext";
 import { SearchProvider } from "./context/SearchContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import { AuthProvider } from "./context/AuthContext";
+import { RecentlyViewedProvider } from "./context/RecentlyViewedContext";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -35,7 +36,9 @@ export default function RootLayout({
           <SearchProvider>
            <WishlistProvider>
             <AuthProvider>
+               <RecentlyViewedProvider>
              {children}
+              </RecentlyViewedProvider>
              </AuthProvider>
            </WishlistProvider>
          </SearchProvider>

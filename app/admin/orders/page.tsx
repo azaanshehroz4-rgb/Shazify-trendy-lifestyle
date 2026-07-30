@@ -1,5 +1,6 @@
 "use client";
 
+
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { useEffect, useState } from "react";
@@ -11,10 +12,30 @@ import {
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import Link from "next/link";
+import { useAuth } from "../../context/AuthContext";
+import { useRouter } from "next/navigation";
+
 
 export default function AdminOrdersPage() {
+
+  const { user, loading } = useAuth();
+const router = useRouter();
     const [orders, setOrders] = useState<any[]>([]);
-const [loading, setLoading] = useState(true);
+const [productsLoading, setProductsLoading] = useState(true);
+const ADMIN_EMAIL = "azaanshehroz4@gmail.com";
+
+useEffect(() => {
+  if (loading) return;
+
+  if (!user) {
+    router.push("/login?redirect=/admin/products");
+    return;
+  }
+
+  if (user.email !== ADMIN_EMAIL) {
+    router.push("/");
+  }
+}, [user, loading, router]);
 useEffect(() => {
   const fetchOrders = async () => {
     try {
@@ -35,7 +56,7 @@ useEffect(() => {
       console.error(error);
     }
 
-    setLoading(false);
+    setProductsLoading(false);
   };
 
   fetchOrders();
@@ -86,9 +107,9 @@ useEffect(() => {
               {order.email}
             </td>
 
-            <td className="p-4">
-              {order.totalItems}
-            </td>
+           <td className="p-4">
+  {order.totalItems} Items
+</td>
 
             <td className="p-4 text-pink-600 font-bold">
               ${order.totalPrice.toFixed(2)}
@@ -96,9 +117,19 @@ useEffect(() => {
 
             <td className="p-4">
 
-              <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full">
-                {order.status}
-              </span>
+             <span
+  className={`px-3 py-1 rounded-full text-sm font-semibold ${
+    order.status === "Pending"
+      ? "bg-yellow-100 text-yellow-700"
+      : order.status === "Processing"
+      ? "bg-blue-100 text-blue-700"
+      : order.status === "Shipped"
+      ? "bg-purple-100 text-purple-700"
+      : "bg-green-100 text-green-700"
+  }`}
+>
+  {order.status}
+</span>
 
             </td>
             <td className="p-4">

@@ -1,6 +1,8 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Link from "next/link";
+import { db } from "../lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 const categories = [
   "Fashion",
@@ -10,7 +12,19 @@ const categories = [
   "Sports",
 ];
 
-export default function CategoriesPage() {
+export default async function CategoriesPage() {
+  const snapshot = await getDocs(collection(db, "products"));
+
+const products: any[] = snapshot.docs.map((doc) => ({
+  id: doc.id,
+  ...doc.data(),
+}));
+
+const categories = [
+  ...new Set(
+    products.map((product) => product.category)
+  ),
+];
   return (
     <>
       <Navbar />

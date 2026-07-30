@@ -5,16 +5,34 @@ import { useAuth } from "../context/AuthContext";
 import { useCart } from "../hooks/useCart";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 export default function CheckoutPage() {
   const { user } = useAuth();
   const router = useRouter();
   const { cart, totalItems, totalPrice,clearCart } = useCart();
+  const [fullName, setFullName] = useState("");
+const [email, setEmail] = useState(user?.email || "");
+const [phone, setPhone] = useState("");
+const [city, setCity] = useState("");
+const [postalCode, setPostalCode] = useState("");
+const [country, setCountry] = useState("");
+const [address, setAddress] = useState("");
+const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
 const handlePlaceOrder = async () => {
   try {
    
-    await addDoc(collection(db, "orders"), {
+   await addDoc(collection(db, "orders"), {
   userId: user?.uid,
-  email: user?.email,
+  email,
+
+  fullName,
+  phone,
+  city,
+  postalCode,
+  country,
+  address,
+
+  paymentMethod,
 
   products: cart,
 
@@ -52,43 +70,60 @@ const handlePlaceOrder = async () => {
           <input
             type="text"
             placeholder="Full Name"
+             value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
             className="w-full border p-3 rounded mb-4"
           />
 
           <input
             type="email"
             placeholder="Email Address"
+              value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full border p-3 rounded mb-4"
           />
 
           <input
             type="text"
             placeholder="Phone Number"
+             value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             className="w-full border p-3 rounded mb-4"
           />
           <input
             type="text"
             placeholder="City"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
             className="w-full border p-3 rounded mb-4"
           />
 
           <input
             type="text"
             placeholder="Postal Code"
+            value={postalCode}
+            onChange={(e) => setPostalCode(e.target.value)}
             className="w-full border p-3 rounded mb-4"
           />
 
           <input
             type="text"
             placeholder="Country"
+             value={country}
+            onChange={(e) => setCountry(e.target.value)}
             className="w-full border p-3 rounded mb-4"
           />
           <textarea
             placeholder="Shipping Address"
+             value={address}
+            onChange={(e) => setAddress(e.target.value)}
             className="w-full border p-3 rounded"
             rows={4}
           />
-          <div className="mt-6">
+         
+            
+
+         <div className="mt-6">
   <h3 className="text-lg font-bold mb-3">
     Payment Method
   </h3>
@@ -97,7 +132,9 @@ const handlePlaceOrder = async () => {
     <input
       type="radio"
       name="payment"
-      defaultChecked
+      value="Cash on Delivery"
+      checked={paymentMethod === "Cash on Delivery"}
+      onChange={(e) => setPaymentMethod(e.target.value)}
     />
     Cash on Delivery
   </label>
@@ -106,6 +143,9 @@ const handlePlaceOrder = async () => {
     <input
       type="radio"
       name="payment"
+      value="Credit Card"
+      checked={paymentMethod === "Credit Card"}
+      onChange={(e) => setPaymentMethod(e.target.value)}
     />
     Credit Card
   </label>
@@ -114,6 +154,9 @@ const handlePlaceOrder = async () => {
     <input
       type="radio"
       name="payment"
+      value="Debit Card"
+      checked={paymentMethod === "Debit Card"}
+      onChange={(e) => setPaymentMethod(e.target.value)}
     />
     Debit Card
   </label>
