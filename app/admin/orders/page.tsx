@@ -9,13 +9,15 @@ import {
   getDocs,
   query,
   orderBy,
+  updateDoc,
+  doc,
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import AdminSidebar from "../../components/AdminSidebar";
-
+import { logActivity } from "../../lib/activityLogger";
 
 export default function AdminOrdersPage() {
 
@@ -30,7 +32,7 @@ useEffect(() => {
   if (authLoading) return;
 
   if (!user) {
-    router.push("/login?redirect=/admin/orders");
+    router.push("/login?redirect=/admin/products");
     return;
   }
 
@@ -63,6 +65,31 @@ useEffect(() => {
 
   fetchOrders();
 }, []);
+const updateOrderStatus = async (
+  orderId: string,
+  status: string
+) => {
+  try {
+    await updateDoc(doc(db, "orders", orderId), {
+      status,
+    });
+    await logActivity(
+  `Order ${orderId.slice(0, 8)} status changed to ${status}`
+);
+
+    setOrders((prev: any[]) =>
+      prev.map((order) =>
+        order.id === orderId
+          ? { ...order, status }
+          : order
+      )
+    );
+
+    alert("Order status updated successfully!");
+  } catch (error) {
+    console.error(error);
+  }
+};
   return (
     <>
       <Navbar />
@@ -115,31 +142,20 @@ useEffect(() => {
               {order.email}
             </td>
 
-           <td className="p-4">
-  {order.totalItems} Items
+          <td className="p-4">
+  <select
+    value={order.status}
+    onChange={(e) =>
+      updateOrderStatus(order.id, e.target.value)
+    }
+    className="border rounded-lg px-3 py-2"
+  >
+    <option value="Pending">Pending</option>
+    <option value="Processing">Processing</option>
+    <option value="Shipped">Shipped</option>
+    <option value="Delivered">Delivered</option>
+  </select>
 </td>
-
-            <td className="p-4 text-pink-600 font-bold">
-              ${order.totalPrice.toFixed(2)}
-            </td>
-
-            <td className="p-4">
-
-             <span
-  className={`px-3 py-1 rounded-full text-sm font-semibold ${
-    order.status === "Pending"
-      ? "bg-yellow-100 text-yellow-700"
-      : order.status === "Processing"
-      ? "bg-blue-100 text-blue-700"
-      : order.status === "Shipped"
-      ? "bg-purple-100 text-purple-700"
-      : "bg-green-100 text-green-700"
-  }`}
->
-  {order.status}
-</span>
-
-            </td>
             <td className="p-4">
   <Link
     href={`/admin/orders/${order.id}`}
@@ -158,10 +174,10 @@ useEffect(() => {
     </table>
   </div>
 )}
-        </div>
-      </div>
-</div>
- </div>
+         </div>
+       </div>
+     </div>
+   </div>
       <Footer />
     </>
   );

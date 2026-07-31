@@ -9,6 +9,7 @@ import { db } from "../../../lib/firebase";
 import { updateDoc } from "firebase/firestore";
 import { useAuth } from "../../../context/AuthContext";
 import { useRouter } from "next/navigation";
+import { logActivity } from "../../../lib/activityLogger";
 
 export default function AdminOrderDetailsPage() {
   const { user } = useAuth();
@@ -60,6 +61,9 @@ const updateStatus = async (status: string) => {
     await updateDoc(orderRef, {
       status,
     });
+    await logActivity(
+  `Order ${order.id.slice(0, 8)} status changed to ${status}`
+);
 
     setOrder({
       ...order,
@@ -148,6 +152,23 @@ const updateStatus = async (status: string) => {
     onClick={() => updateStatus("Processing")}
     className="bg-blue-600 text-white px-4 py-2 rounded-lg"
   >
+      Processing
+  </button>
+  <button
+    onClick={() => updateStatus("Shipped")}
+    className="bg-green-600 text-white px-4 py-2 rounded-lg"
+  >
+    Shipped
+  </button>
+
+  <button
+    onClick={() => updateStatus("Delivered")}
+    className="bg-purple-600 text-white px-4 py-2 rounded-lg"
+  >
+    Delivered
+  </button>
+
+</div>
 
     <div className="mt-10">
 
@@ -188,25 +209,10 @@ const updateStatus = async (status: string) => {
   </div>
 
 </div>
-    Processing
-  </button>
+  
   
 
-  <button
-    onClick={() => updateStatus("Shipped")}
-    className="bg-green-600 text-white px-4 py-2 rounded-lg"
-  >
-    Shipped
-  </button>
-
-  <button
-    onClick={() => updateStatus("Delivered")}
-    className="bg-purple-600 text-white px-4 py-2 rounded-lg"
-  >
-    Delivered
-  </button>
-
-</div>
+  
       
       <div className="mt-8 border-t pt-6">
 

@@ -2,13 +2,17 @@
 
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
-import { useState } from "react";
 import { db } from "../../../lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../../context/AuthContext";
+import { useEffect, useState } from "react";
+import { logActivity } from "../../../lib/activityLogger";
 
 export default function AddProductPage() {
+    
     const router = useRouter();
+     const { user, loading } = useAuth();
 const [stock, setStock] = useState("");
 const [name, setName] = useState("");
 const [category, setCategory] = useState("");
@@ -19,6 +23,7 @@ const [rating, setRating] = useState("");
 const [description, setDescription] = useState("");
 const handleAddProduct = async () => {
   try {
+  
     await addDoc(collection(db, "products"), {
       name,
       category,
@@ -28,17 +33,9 @@ const handleAddProduct = async () => {
       rating: Number(rating),
       stock: Number(stock),
       description,
-      
     });
-    
-    <input
-  type="number"
-  placeholder="Stock"
-  value={stock}
-  onChange={(e) => setStock(e.target.value)}
-  className="w-full border p-3 rounded-lg"
-/>
-
+    await logActivity(`Product Added: ${name}`);
+   
 
     alert("Product Added Successfully!");
 
@@ -48,6 +45,23 @@ const handleAddProduct = async () => {
     console.error(error);
   }
 };
+ 
+const ADMIN_EMAIL = "azaanshehroz4@gmail.com";
+
+useEffect(() => {
+  if (loading) return;
+
+  if (!user) {
+    router.push("/login?redirect=/admin/products/add");
+    return;
+  }
+
+  if (user.email !== ADMIN_EMAIL) {
+    router.push("/");
+  }
+
+}, [user, loading, router]);
+  
 
   return (
     <>
@@ -111,6 +125,15 @@ const handleAddProduct = async () => {
     onChange={(e) => setRating(e.target.value)}
     className="w-full border p-3 rounded-lg"
   />
+
+  <input
+  type="number"
+  placeholder="Stock"
+  value={stock}
+  onChange={(e) => setStock(e.target.value)}
+  className="w-full border p-3 rounded-lg"
+/>
+
   <textarea
   placeholder="Product Description"
   value={description}

@@ -12,13 +12,14 @@ import {
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
+import AdminSidebar from "../../components/AdminSidebar";
 
 export default function AdminReviewsPage() {
      const { user, loading } = useAuth();
 const router = useRouter();
   const [reviews, setReviews] = useState<any[]>([]);
   
-  const [productsLoading, setProductsLoading] = useState(true);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
   const ADMIN_EMAIL = "azaanshehroz4@gmail.com";
 useEffect(() => {
   if (loading) return;
@@ -49,7 +50,7 @@ useEffect(() => {
       console.error(error);
     }
 
-    setProductsLoading(false);
+    setReviewsLoading(false);
   };
 
   useEffect(() => {
@@ -73,12 +74,17 @@ useEffect(() => {
       <Navbar />
 
       <div className="max-w-7xl mx-auto p-10">
+  <div className="flex gap-8">
 
-        <h1 className="text-4xl font-bold text-pink-600 mb-8">
-          Manage Reviews
-        </h1>
+    <AdminSidebar />
 
-        {loading ? (
+    <div className="flex-1">
+
+      <h1 className="text-4xl font-bold text-pink-600 mb-8">
+        Manage Reviews
+      </h1>
+
+        {reviewsLoading ? (
           <p>Loading Reviews...</p>
         ) : reviews.length === 0 ? (
           <p>No Reviews Found.</p>
@@ -117,9 +123,9 @@ useEffect(() => {
 
           </div>
         )}
-
+       </div>
       </div>
-
+    </div>
       <Footer />
     </>
   );

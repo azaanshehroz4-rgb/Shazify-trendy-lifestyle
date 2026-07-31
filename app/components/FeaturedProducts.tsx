@@ -140,15 +140,32 @@ return (
               </h3>
 
               {/* Rating */}
-              <div className="flex mt-3 text-yellow-500">
-                {[...Array(product.rating)].map((_, i) => (
-                  <Star
-                    key={i}
-                    size={16}
-                    fill="currentColor"
-                  />
-                ))}
-              </div>
+              <div className="flex items-center mt-3 text-yellow-500">
+  {Array.from({ length: 5 }, (_, i) => {
+    const starNumber = i + 1;
+
+    return (
+      <Star
+        key={i}
+        size={16}
+        fill={
+          product.rating >= starNumber
+            ? "currentColor"
+            : "none"
+        }
+        className={
+          product.rating >= starNumber
+            ? "text-yellow-500"
+            : "text-gray-300"
+        }
+      />
+    );
+  })}
+
+  <span className="ml-2 text-sm text-gray-600">
+    ({product.rating})
+  </span>
+</div>
 
               {/* Price */}
               <div className="flex items-center gap-3 mt-4">

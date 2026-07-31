@@ -7,6 +7,7 @@ import { auth } from "../lib/firebase";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,6 +15,10 @@ const [password, setPassword] = useState("");
 const [loading, setLoading] = useState(false);
 
 const router = useRouter();
+const searchParams = useSearchParams();
+
+const redirect =
+  searchParams.get("redirect") || "/";
 const handleLogin = async (e: React.FormEvent) => {
   e.preventDefault();
 
@@ -33,7 +38,7 @@ const handleLogin = async (e: React.FormEvent) => {
 
     alert("Login Successful!");
 
-    router.push("/");
+    router.push(redirect);
 
   } catch (error: any) {
     alert(error.message);

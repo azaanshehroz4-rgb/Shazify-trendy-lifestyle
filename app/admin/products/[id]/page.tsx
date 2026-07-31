@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { db } from "../../../lib/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { logActivity } from "../../../lib/activityLogger";
 
 export default function EditProductPage() {
     const params = useParams();
@@ -18,12 +19,14 @@ const [price, setPrice] = useState("");
 const [oldPrice, setOldPrice] = useState("");
 const [rating, setRating] = useState("");
 const [description, setDescription] = useState("");
+const [stock, setStock] = useState("");
 useEffect(() => {
   const fetchProduct = async () => {
     try {
       const docRef = doc(db, "products", params.id as string);
 
       const docSnap = await getDoc(docRef);
+
 
       if (docSnap.exists()) {
         const data = docSnap.data();
@@ -35,6 +38,7 @@ console.log(data);
         setOldPrice(data.oldPrice.toString());
         setRating(data.rating.toString());
         setDescription(data.description || "");
+        setStock(data.stock?.toString() || "");
       }
     } catch (error) {
       console.error(error);
@@ -53,7 +57,9 @@ const handleUpdateProduct = async () => {
       oldPrice: Number(oldPrice),
       rating: Number(rating),
       description,
+      stock: Number(stock),
     });
+    await logActivity(`Product Updated: ${name}`);
 
     alert("Product Updated Successfully!");
 
@@ -117,12 +123,21 @@ const handleUpdateProduct = async () => {
       onChange={(e) => setRating(e.target.value)}
       className="w-full border p-3 rounded-lg"
     />
+
+    <input
+      type="number"
+      placeholder="Stock"
+      value={stock}
+      onChange={(e) => setStock(e.target.value)}
+      className="w-full border p-3 rounded-lg"
+     />
+
     <textarea
-  placeholder="Product Description"
-  value={description}
-  onChange={(e) => setDescription(e.target.value)}
-  className="w-full border p-3 rounded-lg h-32"
-/>
+      placeholder="Product Description"
+      value={description}
+      onChange={(e) => setDescription(e.target.value)}
+      className="w-full border p-3 rounded-lg h-32"
+    />
 
     <button
       onClick={handleUpdateProduct}
