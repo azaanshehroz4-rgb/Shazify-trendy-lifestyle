@@ -8,7 +8,7 @@ import {
 } from "react";
 
 export interface CartItem {
-  id: number;
+  id: string;
   name: string;
   category: string;
   image: string;
@@ -23,11 +23,11 @@ interface CartContextType {
 
  addToCart: (product: Omit<CartItem, "quantity">) => void;
 
-  removeFromCart: (id: number) => void;
+  removeFromCart: (id: string) => void;
 
-  increaseQuantity: (id: number) => void;
+  increaseQuantity: (id: string) => void;
 
-  decreaseQuantity: (id: number) => void;
+  decreaseQuantity: (id: string) => void;
 
   clearCart: () => void;
 
@@ -71,38 +71,37 @@ export function CartProvider({
     });
   };
 
-  const removeFromCart = (id: number) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
-  };
+ const removeFromCart = (id: string) => {
+  setCart((prev) => prev.filter((item) => item.id !== id));
+};
 
-  const increaseQuantity = (id: number) => {
-    setCart((prev) =>
-      prev.map((item) =>
+const increaseQuantity = (id: string) => {
+  setCart((prev) =>
+    prev.map((item) =>
+      item.id === id
+        ? {
+            ...item,
+            quantity: item.quantity + 1,
+          }
+        : item
+    )
+  );
+};
+
+const decreaseQuantity = (id: string) => {
+  setCart((prev) =>
+    prev
+      .map((item) =>
         item.id === id
           ? {
               ...item,
-              quantity: item.quantity + 1,
+              quantity: item.quantity - 1,
             }
           : item
       )
-    );
-  };
-
-  const decreaseQuantity = (id: number) => {
-    setCart((prev) =>
-      prev
-        .map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                quantity: item.quantity - 1,
-              }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
-    );
-  };
-
+      .filter((item) => item.quantity > 0)
+  );
+};
   const clearCart = () => {
      console.log("Clear Cart Clicked");
     setCart([]);

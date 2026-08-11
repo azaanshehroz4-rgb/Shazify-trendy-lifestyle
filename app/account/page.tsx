@@ -131,8 +131,36 @@ if (!user) {
   </div>
 </Link>
 
+<Link href="/account/reviews">
+  <div className="border rounded-xl p-6 hover:shadow-lg transition cursor-pointer">
+    ⭐
+    <h3 className="text-xl font-bold mt-4">
+      My Reviews
+    </h3>
+
+    <p className="text-gray-500 mt-2">
+      View all your reviews.
+    </p>
+  </div>
+</Link>
+
+<Link href="/account/questions">
+  <div className="border rounded-xl p-6 hover:shadow-lg transition cursor-pointer">
+    ❓
+    <h3 className="text-xl font-bold mt-4">
+      My Questions
+    </h3>
+
+    <p className="text-gray-500 mt-2">
+      View your questions and answers.
+    </p>
+  </div>
+</Link>
+
+ <Link href="/account/settings">
   <div className="border rounded-xl p-6 hover:shadow-lg transition cursor-pointer">
     ⚙️
+
     <h3 className="text-xl font-bold mt-4">
       Account Settings
     </h3>
@@ -141,6 +169,7 @@ if (!user) {
       Manage your account.
     </p>
   </div>
+</Link>
 
   <button
     onClick={async () => {

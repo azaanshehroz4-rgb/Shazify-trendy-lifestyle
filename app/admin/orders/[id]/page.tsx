@@ -19,6 +19,8 @@ const router = useRouter();
 const [order, setOrder] = useState<any>(null);
 const [loading, setLoading] = useState(true);
 const ADMIN_EMAIL = "azaanshehroz4@gmail.com";
+const [trackingNumber, setTrackingNumber] = useState("");
+const [courier, setCourier] = useState("");
 
 useEffect(() => {
   if (!user) {
@@ -42,6 +44,8 @@ useEffect(() => {
           id: docSnap.id,
           ...docSnap.data(),
         });
+        setTrackingNumber(docSnap.data().trackingNumber || "");
+        setCourier(docSnap.data().courier || "");
       }
     } catch (error) {
       console.error(error);
@@ -70,6 +74,24 @@ const updateStatus = async (status: string) => {
       status,
     });
 
+  } catch (error) {
+    console.error(error);
+  }
+};
+const saveTrackingInfo = async () => {
+  if (!order) return;
+
+  try {
+    await updateDoc(doc(db, "orders", order.id), {
+      trackingNumber,
+      courier,
+    });
+
+    await logActivity(
+      `Tracking updated for ${order.orderId || order.id}`
+    );
+
+    alert("Tracking information saved!");
   } catch (error) {
     console.error(error);
   }
@@ -208,55 +230,51 @@ const updateStatus = async (status: string) => {
 
   </div>
 
-</div>
+</div> 
   
-  
-
-  
-      
-      <div className="mt-8 border-t pt-6">
+  <div className="mt-10 border-t pt-8">
 
   <h2 className="text-2xl font-bold mb-6">
-    Billing Information
+    Tracking Information
   </h2>
 
-  <div className="space-y-3">
+  <div className="space-y-5">
 
-    <p>
-      <strong>Full Name:</strong> {order.fullName}
-    </p>
+    <input
+      type="text"
+      placeholder="Tracking Number"
+      value={trackingNumber}
+      onChange={(e) => setTrackingNumber(e.target.value)}
+      className="w-full border rounded-xl p-3"
+    />
 
-    <p>
-      <strong>Email:</strong> {order.email}
-    </p>
+    <select
+      value={courier}
+      onChange={(e) => setCourier(e.target.value)}
+      className="w-full border rounded-xl p-3"
+    >
+      <option value="">Select Courier</option>
+      <option value="Leopards">Leopards</option>
+      <option value="TCS">TCS</option>
+      <option value="M&P">M&P</option>
+      <option value="Pakistan Post">Pakistan Post</option>
+      <option value="DHL">DHL</option>
+    </select>
 
-    <p>
-      <strong>Phone:</strong> {order.phone}
-    </p>
-
-    <p>
-      <strong>City:</strong> {order.city}
-    </p>
-
-    <p>
-      <strong>Postal Code:</strong> {order.postalCode}
-    </p>
-
-    <p>
-      <strong>Country:</strong> {order.country}
-    </p>
-
-    <p>
-      <strong>Address:</strong> {order.address}
-    </p>
-
-    <p>
-      <strong>Payment Method:</strong> {order.paymentMethod}
-    </p>
+    <button
+      onClick={saveTrackingInfo}
+      className="bg-pink-600 text-white px-6 py-3 rounded-xl hover:bg-pink-700"
+    >
+      Save Tracking
+    </button>
 
   </div>
 
 </div>
+
+  
+      
+    
     </div>
 
   </div>

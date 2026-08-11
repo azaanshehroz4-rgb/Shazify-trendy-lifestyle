@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
+import Image from "next/image";
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
@@ -54,7 +55,7 @@ export default function OrderDetailsPage() {
           <div className="bg-white rounded-2xl shadow-lg p-8">
 
             <h2 className="text-2xl font-bold">
-              Order #{order.id.slice(0, 8)}
+              Order {order.orderId || order.id.slice(0, 8)}
             </h2>
 
             <p className="mt-4">
@@ -68,6 +69,48 @@ export default function OrderDetailsPage() {
             <p className="text-pink-600 font-bold">
               Total Price: ${order.totalPrice.toFixed(2)}
             </p>
+
+            <div className="mt-8 border rounded-xl p-6 bg-gray-50">
+
+          <h3 className="text-xl font-bold mb-5">
+         Customer Information
+       </h3>
+
+         <div className="space-y-2">
+
+       <p>
+         <span className="font-semibold">Name:</span>{" "}
+         {order.fullName}
+       </p>
+
+       <p>
+         <span className="font-semibold">Phone:</span>{" "}
+          {order.phone}
+       </p>
+
+        <p>
+         <span className="font-semibold">Address:</span>{" "}
+          {order.address}
+        </p>
+
+          <p>
+            <span className="font-semibold">City:</span>{" "}
+            {order.city}
+           </p>
+
+            <p>
+              <span className="font-semibold">Country:</span>{" "}
+             {order.country}
+            </p>
+
+             <p>
+               <span className="font-semibold">Postal Code:</span>{" "}
+                {order.postalCode}
+              </p>
+
+            </div>
+
+         </div>
 
             <p className="mt-2">
               Status:
@@ -95,17 +138,29 @@ export default function OrderDetailsPage() {
               {order.products?.map((product: any) => (
                 <div
                   key={product.id}
-                  className="flex justify-between border-b py-4"
+                  className="flex items-center justify-between border-b py-4"
                 >
-                  <div>
-                    <h4 className="font-bold">
-                      {product.name}
-                    </h4>
+                 <div className="flex items-center gap-4">
 
-                    <p className="text-gray-500">
-                      Quantity: {product.quantity}
-                    </p>
-                  </div>
+                  <Image
+                     src={product.image}
+                     alt={product.name}
+                     width={80}
+                     height={80}
+                     className="rounded-lg object-cover"
+                  />
+
+                <div>
+                  <h4 className="font-bold">
+                       {product.name}
+                  </h4>
+
+                <p className="text-gray-500">
+                   Quantity: {product.quantity}
+               </p>
+                </div>
+
+               </div>
 
                   <p className="font-bold text-pink-600">
                     ${product.price}
@@ -170,6 +225,51 @@ export default function OrderDetailsPage() {
     </div>
 
   </div>
+</div>
+
+<div className="mt-10 border-t pt-8">
+
+  <h2 className="text-2xl font-bold mb-6">
+    Tracking Information
+  </h2>
+
+  <div className="space-y-4">
+
+    <p>
+      <strong>Courier:</strong>{" "}
+      {order.courier || "Not Assigned Yet"}
+    </p>
+
+    <p>
+      <strong>Tracking Number:</strong>{" "}
+      {order.trackingNumber || "Not Available"}
+    </p>
+
+    {order.trackingNumber && (
+     <a
+  href={
+    order.courier === "Leopards"
+      ? "https://www.leopardscourier.com/tracking"
+      : order.courier === "TCS"
+      ? "https://www.tcsexpress.com/tracking"
+      : order.courier === "M&P"
+      ? "https://mulphilog.com/track-shipment"
+      : order.courier === "Pakistan Post"
+      ? "https://ep.gov.pk/track"
+      : order.courier === "DHL"
+      ? "https://www.dhl.com/global-en/home/tracking.html"
+      : "#"
+  }
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-block bg-pink-600 text-white px-6 py-3 rounded-xl hover:bg-pink-700 transition"
+>
+  Track Shipment
+</a>
+    )}
+
+  </div>
+
 </div>
 
             </div>

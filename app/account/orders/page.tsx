@@ -74,7 +74,7 @@ export default function MyOrdersPage() {
               >
 
                 <h2 className="font-bold text-xl">
-                  Order #{order.id.slice(0, 8)}
+                    Order {order.orderId || order.id.slice(0, 8)}
                 </h2>
 
                 <p className="mt-2">
@@ -115,24 +115,37 @@ export default function MyOrdersPage() {
   </h3>
 
   {order.products?.map((product: any) => (
-    <div
-      key={product.id}
-      className="flex justify-between py-2 border-b"
-    >
-      <div>
-        <p className="font-semibold">
-          {product.name}
-        </p>
+   <div
+  key={product.id}
+  className="flex items-center justify-between py-3 border-b"
+>
 
-        <p className="text-gray-500 text-sm">
-          Quantity: {product.quantity}
-        </p>
-      </div>
+  <div className="flex items-center gap-4">
 
-      <p className="font-bold text-pink-600">
-        ${product.price}
+    <img
+      src={product.image}
+      alt={product.name}
+      className="w-20 h-20 rounded-lg object-cover"
+    />
+
+    <div>
+      <p className="font-semibold">
+        {product.name}
+      </p>
+
+      <p className="text-gray-500 text-sm">
+        Quantity: {product.quantity}
       </p>
     </div>
+
+  </div>
+
+
+  <p className="font-bold text-pink-600">
+    ${product.price}
+  </p>
+
+</div>
   ))}
 </div>
 

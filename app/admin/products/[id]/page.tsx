@@ -19,6 +19,9 @@ const [price, setPrice] = useState("");
 const [oldPrice, setOldPrice] = useState("");
 const [rating, setRating] = useState("");
 const [description, setDescription] = useState("");
+const [pinterestTitle, setPinterestTitle] = useState("");
+const [pinterestDescription, setPinterestDescription] = useState("");
+const [affiliateLink, setAffiliateLink] = useState("");
 const [stock, setStock] = useState("");
 useEffect(() => {
   const fetchProduct = async () => {
@@ -38,6 +41,9 @@ console.log(data);
         setOldPrice(data.oldPrice.toString());
         setRating(data.rating.toString());
         setDescription(data.description || "");
+        setPinterestTitle(data.pinterestTitle || "");
+        setPinterestDescription(data.pinterestDescription || "");
+        setAffiliateLink(data.affiliateLink || "");
         setStock(data.stock?.toString() || "");
       }
     } catch (error) {
@@ -48,6 +54,10 @@ console.log(data);
   fetchProduct();
 }, [params.id]);
 const handleUpdateProduct = async () => {
+  if (Number(rating) < 1 || Number(rating) > 5) {
+  alert("Rating must be between 1 and 5.");
+  return;
+}
   try {
     await updateDoc(doc(db, "products", params.id as string), {
       name,
@@ -57,6 +67,9 @@ const handleUpdateProduct = async () => {
       oldPrice: Number(oldPrice),
       rating: Number(rating),
       description,
+      pinterestTitle,
+      pinterestDescription,
+       affiliateLink,
       stock: Number(stock),
     });
     await logActivity(`Product Updated: ${name}`);
@@ -138,6 +151,47 @@ const handleUpdateProduct = async () => {
       onChange={(e) => setDescription(e.target.value)}
       className="w-full border p-3 rounded-lg h-32"
     />
+
+<div className="mb-6">
+  <label className="block font-semibold mb-2">
+    Pinterest Title
+  </label>
+
+  <input
+    type="text"
+    value={pinterestTitle}
+    onChange={(e) => setPinterestTitle(e.target.value)}
+    placeholder="Best Wireless Headphones Under $100 | Shazify"
+    className="w-full border rounded-xl p-3"
+  />
+</div>
+
+<div className="mb-6">
+  <label className="block font-semibold mb-2">
+    Pinterest Description
+  </label>
+
+  <textarea
+    value={pinterestDescription}
+    onChange={(e) => setPinterestDescription(e.target.value)}
+    placeholder="Write SEO-friendly Pinterest description..."
+    className="w-full border rounded-xl p-3 h-32"
+  />
+</div>
+
+    <div className="mb-6">
+  <label className="block font-semibold mb-2">
+    AliExpress Affiliate Link
+  </label>
+
+  <input
+    type="text"
+    value={affiliateLink}
+    onChange={(e) => setAffiliateLink(e.target.value)}
+    placeholder="https://s.click.aliexpress.com/..."
+    className="w-full border rounded-xl p-3"
+  />
+</div>
 
     <button
       onClick={handleUpdateProduct}

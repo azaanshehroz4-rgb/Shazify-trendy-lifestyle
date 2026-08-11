@@ -134,16 +134,26 @@ const updateOrderStatus = async (
             className="border-b hover:bg-gray-50"
           >
 
-            <td className="p-4">
-              {order.id.slice(0, 8)}
-            </td>
+           <td className="p-4 font-semibold">
+               {order.orderId || order.id.slice(0, 8)}
+           </td>
 
-            <td className="p-4">
-              {order.email}
-            </td>
+           
+           <td className="p-4">
+  {order.email}
+</td>
 
-          <td className="p-4">
+<td className="p-4">
+  {order.products?.length || 0} items
+</td>
+
+<td className="p-4">
+  ${order.totalPrice}
+</td>
+
+<td className="p-4">
   <select
+    
     value={order.status}
     onChange={(e) =>
       updateOrderStatus(order.id, e.target.value)

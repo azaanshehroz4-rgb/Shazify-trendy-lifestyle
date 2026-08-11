@@ -21,7 +21,21 @@ const [price, setPrice] = useState("");
 const [oldPrice, setOldPrice] = useState("");
 const [rating, setRating] = useState("");
 const [description, setDescription] = useState("");
+const [pinterestTitle, setPinterestTitle] = useState("");
+const [pinterestDescription, setPinterestDescription] = useState("");
+const [affiliateLink, setAffiliateLink] = useState("");
 const handleAddProduct = async () => {
+  
+  
+
+
+
+  
+  if (Number(rating) < 1 || Number(rating) > 5) {
+    alert("Rating must be between 1 and 5.");
+    return;
+  }
+
   try {
   
     await addDoc(collection(db, "products"), {
@@ -33,6 +47,9 @@ const handleAddProduct = async () => {
       rating: Number(rating),
       stock: Number(stock),
       description,
+      pinterestTitle,
+      pinterestDescription,
+      affiliateLink,
     });
     await logActivity(`Product Added: ${name}`);
    
@@ -121,6 +138,8 @@ useEffect(() => {
   <input
     type="number"
     placeholder="Rating (1-5)"
+    min="1"
+    max="5"
     value={rating}
     onChange={(e) => setRating(e.target.value)}
     className="w-full border p-3 rounded-lg"
@@ -140,6 +159,45 @@ useEffect(() => {
   onChange={(e) => setDescription(e.target.value)}
   className="w-full border p-3 rounded-lg h-32"
 />
+<div className="mb-6">
+  <label className="block font-semibold mb-2">
+    Pinterest Title
+  </label>
+
+  <input
+    type="text"
+    value={pinterestTitle}
+    onChange={(e) => setPinterestTitle(e.target.value)}
+    placeholder="Best Wireless Headphones Under $100 | Shazify"
+    className="w-full border rounded-xl p-3"
+  />
+</div>
+
+<div className="mb-6">
+  <label className="block font-semibold mb-2">
+    Pinterest Description
+  </label>
+
+  <textarea
+    value={pinterestDescription}
+    onChange={(e) => setPinterestDescription(e.target.value)}
+    placeholder="Write SEO-friendly Pinterest description..."
+    className="w-full border rounded-xl p-3 h-32"
+  />
+</div>
+<div className="mb-6">
+  <label className="block font-semibold mb-2">
+    AliExpress Affiliate Link
+  </label>
+
+  <input
+    type="text"
+    value={affiliateLink}
+    onChange={(e) => setAffiliateLink(e.target.value)}
+    placeholder="https://s.click.aliexpress.com/..."
+    className="w-full border rounded-xl p-3"
+  />
+</div>
 
   <button
     onClick={handleAddProduct}

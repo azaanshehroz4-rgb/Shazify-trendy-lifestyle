@@ -20,7 +20,7 @@ const [address, setAddress] = useState("");
 const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
 const handlePlaceOrder = async () => {
   try {
-   
+   const orderId = `SHZ-${Date.now()}`;
    await addDoc(collection(db, "orders"), {
   userId: user?.uid,
   email,
@@ -39,9 +39,24 @@ const handlePlaceOrder = async () => {
   totalItems,
   totalPrice,
 
+  orderId,
   status: "Pending",
+  paymentStatus: "Pending",
+  trackingNumber: "",
 
   createdAt: serverTimestamp(),
+});
+await fetch("/api/send-order-email", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    email,
+    fullName,
+    orderId,
+    totalPrice,
+  }),
 });
 
     clearCart();
@@ -123,46 +138,76 @@ const handlePlaceOrder = async () => {
          
             
 
-         <div className="mt-6">
-  <h3 className="text-lg font-bold mb-3">
+        <div className="mt-8">
+  <h3 className="text-xl font-bold mb-5">
     Payment Method
   </h3>
 
-  <label className="flex items-center gap-2 mb-2">
-    <input
-      type="radio"
-      name="payment"
-      value="Cash on Delivery"
-      checked={paymentMethod === "Cash on Delivery"}
-      onChange={(e) => setPaymentMethod(e.target.value)}
-    />
-    Cash on Delivery
-  </label>
+  <div className="space-y-4">
 
-  <label className="flex items-center gap-2 mb-2">
-    <input
-      type="radio"
-      name="payment"
-      value="Credit Card"
-      checked={paymentMethod === "Credit Card"}
-      onChange={(e) => setPaymentMethod(e.target.value)}
-    />
-    Credit Card
-  </label>
+    <label className="border rounded-xl p-4 flex items-center justify-between cursor-pointer hover:border-pink-500">
 
-  <label className="flex items-center gap-2">
-    <input
-      type="radio"
-      name="payment"
-      value="Debit Card"
-      checked={paymentMethod === "Debit Card"}
-      onChange={(e) => setPaymentMethod(e.target.value)}
-    />
-    Debit Card
-  </label>
+      <div>
+        <p className="font-bold">
+          💵 Cash on Delivery
+        </p>
+
+        <p className="text-sm text-gray-500">
+          Pay when your order arrives.
+        </p>
+      </div>
+
+      <input
+        type="radio"
+        name="payment"
+        value="Cash on Delivery"
+        checked={paymentMethod === "Cash on Delivery"}
+        onChange={(e) => setPaymentMethod(e.target.value)}
+      />
+
+    </label>
+
+    <label className="border rounded-xl p-4 flex items-center justify-between opacity-60">
+
+      <div>
+        <p className="font-bold">
+          💳 Stripe Card
+        </p>
+
+        <p className="text-sm text-gray-500">
+          Coming Soon
+        </p>
+      </div>
+
+      <input
+        type="radio"
+        disabled
+      />
+
+    </label>
+
+    <label className="border rounded-xl p-4 flex items-center justify-between opacity-60">
+
+      <div>
+        <p className="font-bold">
+          🅿️ PayPal
+        </p>
+
+        <p className="text-sm text-gray-500">
+          Coming Soon
+        </p>
+      </div>
+
+      <input
+        type="radio"
+        disabled
+      />
+
+    </label>
+
+  </div>
 </div>
-        </div>
-
+</div>
         {/* Order Summary */}
         <div className="border rounded-xl p-6 shadow">
           <h2 className="text-2xl font-bold mb-5">

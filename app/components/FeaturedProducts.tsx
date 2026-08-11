@@ -190,6 +190,16 @@ return (
                 Add To Cart
                 
               </button>
+              {product.affiliateLink && (
+  <a
+    href={product.affiliateLink}
+    target="_blank"
+    rel="noopener noreferrer nofollow"
+    className="w-full mt-3 bg-orange-500 text-white py-3 rounded-xl hover:bg-orange-600 transition flex items-center justify-center font-semibold"
+  >
+    🛍️ Buy on AliExpress
+  </a>
+)}
 
             </div>
           </div>
