@@ -118,6 +118,7 @@ const updateOrderStatus = async (
           <th className="p-4 text-left">Order ID</th>
           <th className="p-4 text-left">Customer</th>
           <th className="p-4 text-left">Items</th>
+          <th className="p-4 text-left">Products</th>
           <th className="p-4 text-left">Total</th>
           <th className="p-4 text-left">Status</th>
           <th className="p-4 text-left">Action</th>
@@ -145,6 +146,18 @@ const updateOrderStatus = async (
 
 <td className="p-4">
   {order.products?.length || 0} items
+</td>
+<td className="p-4">
+  <div className="flex -space-x-2">
+    {order.products?.slice(0, 3).map((product: any) => (
+      <img
+        key={product.id}
+        src={product.image}
+        alt={product.name}
+        className="w-12 h-12 rounded-lg object-cover border-2 border-white"
+      />
+    ))}
+  </div>
 </td>
 
 <td className="p-4">

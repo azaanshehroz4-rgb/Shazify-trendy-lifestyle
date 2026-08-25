@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../../../context/AuthContext";
 import { useEffect, useState } from "react";
 import { logActivity } from "../../../lib/activityLogger";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+const storage = getStorage();
 
 export default function AddProductPage() {
     
@@ -17,6 +19,8 @@ const [stock, setStock] = useState("");
 const [name, setName] = useState("");
 const [category, setCategory] = useState("");
 const [image, setImage] = useState("");
+const [imageFile, setImageFile] = useState<File | null>(null);
+const [uploading, setUploading] = useState(false);
 const [price, setPrice] = useState("");
 const [oldPrice, setOldPrice] = useState("");
 const [rating, setRating] = useState("");
@@ -36,33 +40,51 @@ const handleAddProduct = async () => {
     return;
   }
 
-  try {
-  
-    await addDoc(collection(db, "products"), {
-      name,
-      category,
-      image,
-      price: Number(price),
-      oldPrice: Number(oldPrice),
-      rating: Number(rating),
-      stock: Number(stock),
-      description,
-      pinterestTitle,
-      pinterestDescription,
-      affiliateLink,
-    });
-    await logActivity(`Product Added: ${name}`);
-   
+ try {
 
-    alert("Product Added Successfully!");
-
-    router.push("/admin/products");
-
-  } catch (error) {
-    console.error(error);
+  if (!imageFile) {
+    alert("Please select a product image.");
+    return;
   }
-};
- 
+
+  setUploading(true);
+
+  const imageRef = ref(
+    storage,
+    `products/${Date.now()}-${imageFile.name}`
+  );
+
+  await uploadBytes(imageRef, imageFile);
+
+  const imageUrl = await getDownloadURL(imageRef);
+
+  await addDoc(collection(db, "products"), {
+    name,
+    category,
+    image: imageUrl,
+    price: Number(price),
+    oldPrice: Number(oldPrice),
+    rating: Number(rating),
+    stock: Number(stock),
+    description,
+    pinterestTitle,
+    pinterestDescription,
+    affiliateLink,
+  });
+
+  await logActivity(`Product Added: ${name}`);
+
+  alert("Product Added Successfully!");
+
+  router.push("/admin/products");
+
+} catch (error) {
+  console.error(error);
+  alert("Failed to add product.");
+} finally {
+  setUploading(false);
+}
+}
 const ADMIN_EMAIL = "azaanshehroz4@gmail.com";
 
 useEffect(() => {
@@ -111,13 +133,20 @@ useEffect(() => {
     className="w-full border p-3 rounded-lg"
   />
 
+  <div>
+  <label className="block font-semibold mb-2">
+    Product Image
+  </label>
+
   <input
-    type="text"
-    placeholder="Image Path (Example: /images/product1.jpg)"
-    value={image}
-    onChange={(e) => setImage(e.target.value)}
+    type="file"
+    accept="image/*"
+    onChange={(e) =>
+      setImageFile(e.target.files?.[0] || null)
+    }
     className="w-full border p-3 rounded-lg"
   />
+  </div>
 
   <input
     type="number"
@@ -199,12 +228,13 @@ useEffect(() => {
   />
 </div>
 
-  <button
-    onClick={handleAddProduct}
-    className="w-full bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700"
-  >
-    Save Product
-  </button>
+ <button
+  onClick={handleAddProduct}
+  disabled={uploading}
+  className="w-full bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 disabled:opacity-50"
+>
+  {uploading ? "Uploading Image..." : "Save Product"}
+</button>
 
 </div>
           

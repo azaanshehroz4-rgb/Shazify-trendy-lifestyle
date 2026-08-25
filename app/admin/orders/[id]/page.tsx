@@ -202,23 +202,30 @@ const saveTrackingInfo = async () => {
 
     {order.products.map((item: any) => (
 
-      <div
-        key={item.id}
-        className="flex justify-between border rounded-xl p-4"
-      >
+     <div
+       key={item.id}
+        className="flex items-center justify-between border rounded-xl p-4"
+     >
 
-        <div>
+       <div className="flex items-center gap-4">
 
-          <h3 className="font-bold">
-            {item.name}
-          </h3>
+  <img
+    src={item.image}
+    alt={item.name}
+    className="w-20 h-20 rounded-lg object-cover border"
+  />
 
+  <div>
+    <h3 className="font-bold">
+      {item.name}
+    </h3>
 
-          <p className="text-gray-500">
-            Quantity: {item.quantity}
-          </p>
+    <p className="text-gray-500">
+      Quantity: {item.quantity}
+    </p>
+  </div>
 
-        </div>
+</div>
 
         <p className="font-bold text-pink-600">
           ${item.price}

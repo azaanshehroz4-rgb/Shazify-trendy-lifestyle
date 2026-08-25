@@ -76,6 +76,12 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
+
+  if (loading) return;
+
+  if (!user) return;
+
+  if (user.email !== ADMIN_EMAIL) return;
   
   const fetchOrders = async () => {
     try {
@@ -192,9 +198,20 @@ setTopProducts(topSelling);
   };
 
   fetchOrders();
-}, []);
+}, [loading, user]);
  const [totalRevenue, setTotalRevenue] = useState(0);
  const [customers, setCustomers] = useState(0);
+ if (loading) {
+  return <p className="p-10">Checking access...</p>;
+}
+
+if (!user) {
+  return null;
+}
+
+if (user.email !== ADMIN_EMAIL) {
+  return null;
+}
  
 return (
     <div className="min-h-screen bg-gray-100">

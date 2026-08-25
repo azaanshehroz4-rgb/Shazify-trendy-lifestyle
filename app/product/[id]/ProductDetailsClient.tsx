@@ -16,6 +16,9 @@ import {
   serverTimestamp,
    query,
   where,
+  doc,
+deleteDoc,
+updateDoc
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useRecentlyViewed } from "../../context/RecentlyViewedContext";
@@ -28,7 +31,15 @@ export default function ProductDetails({
 }) {
   const [quantity, setQuantity] = useState(1);
 
-  const { addToCart } = useCart();
+ const {
+  addToCart,
+  removeFromCart,
+  increaseQuantity,
+  decreaseQuantity,
+  clearCart,
+  totalItems,
+  totalPrice,
+} = useCart();
   const {
   addToWishlist,
   removeFromWishlist,
@@ -118,16 +129,25 @@ const filteredReviews = sortedReviews.filter((review: any) => {
   useEffect(() => {
   const fetchRelatedProducts = async () => {
 
-    const questionSnapshot = await getDocs(collection(db, "questions"));
+   if (user?.uid) {
+  const questionsQuery = query(
+    collection(db, "questions"),
+    where("userId", "==", user.uid),
+    where("productId", "==", product.id)
+  );
 
-const questionData = questionSnapshot.docs
-  .map((doc) => ({
+  const questionSnapshot = await getDocs(questionsQuery);
+
+  const questionData = questionSnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
-  }))
-  .filter((question: any) => question.productId === product.id);
+  }));
 
-setQuestions(questionData);
+  setQuestions(questionData);
+} else {
+  setQuestions([]);
+}
+
 setQuestionsLoading(false);
     const reviewSnapshot = await getDocs(collection(db, "reviews"));
 
@@ -169,7 +189,7 @@ if (reviewData.length > 0) {
   };
 
   fetchRelatedProducts();
-}, [product]);
+}, [product, user]);
 useEffect(() => {
   addRecentlyViewed(product);
 }, [product]);
@@ -178,6 +198,15 @@ useEffect(() => {
       addToCart(product);
     }
   };
+  const handleBuyNow = () => {
+  clearCart();
+
+  for (let i = 0; i < quantity; i++) {
+    addToCart(product);
+  }
+
+  router.push("/checkout");
+};
 const handlePinterestShare = () => {
   const pageUrl = window.location.href;
 
@@ -200,34 +229,6 @@ const handleSubmitReview = async () => {
     return;
   }
 
-let verifiedPurchase = false;
-
-if (user?.email) {
-  const ordersQuery = query(
-    collection(db, "orders"),
-    where("email", "==", user.email)
-  );
-
-  const orderSnapshot = await getDocs(ordersQuery);
-
-  verifiedPurchase = orderSnapshot.docs.some((orderDoc: any) => {
-    const order = orderDoc.data();
-
-    return order.products?.some(
-  (item: any) => item.id === product.id
-);
-  });
-console.log("Logged in email:", user?.email);
-
-orderSnapshot.docs.forEach((doc) => {
-  console.log("Order:", doc.data());
-});
-
-console.log("Verified Purchase:", verifiedPurchase);
-}
-
-
-
   try {
     await addDoc(collection(db, "reviews"), {
       productId: product.id,
@@ -238,7 +239,7 @@ console.log("Verified Purchase:", verifiedPurchase);
       rating: reviewRating,
       comment: reviewComment,
       createdAt: serverTimestamp(),
-      verifiedPurchase,
+      verifiedPurchase: false,
     });
 
     alert("Review submitted successfully!");
@@ -247,20 +248,25 @@ console.log("Verified Purchase:", verifiedPurchase);
     setReviewRating(5);
     setReviewComment("");
 
-    // Refresh reviews
-    const reviewSnapshot = await getDocs(collection(db, "reviews"));
+    const reviewSnapshot = await getDocs(
+      collection(db, "reviews")
+    );
 
     const reviewData = reviewSnapshot.docs
       .map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }))
-      .filter((review: any) => review.productId === product.id);
+      .filter(
+        (review: any) =>
+          review.productId === product.id
+      );
 
     setReviews(reviewData);
 
   } catch (error) {
-    console.error(error);
+    console.error("Submit review error:", error);
+    alert("Failed to submit review.");
   }
 };
 const handleSubmitQuestion = async () => {
@@ -300,6 +306,77 @@ const handleSubmitQuestion = async () => {
   } catch (error) {
     console.error(error);
     alert("Failed to submit question.");
+  }
+};
+
+const handleDeleteReview = async (reviewId: string) => {
+  if (!user) {
+    alert("Please login first.");
+    return;
+  }
+
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete your review?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    const reviewRef = doc(db, "reviews", reviewId);
+
+    await deleteDoc(reviewRef);
+
+    setReviews((prevReviews) =>
+      prevReviews.filter((review) => review.id !== reviewId)
+    );
+
+    alert("Review deleted successfully!");
+  } catch (error) {
+    console.error("Delete review error:", error);
+    alert("Failed to delete review.");
+  }
+};
+
+const handleEditReview = async (review: any) => {
+  if (!user || review.userId !== user.uid) {
+    alert("You can only edit your own review.");
+    return;
+  }
+
+  const newComment = window.prompt(
+    "Edit your review:",
+    review.comment
+  );
+
+  if (newComment === null) return;
+
+  if (!newComment.trim()) {
+    alert("Review cannot be empty.");
+    return;
+  }
+
+  try {
+    const reviewRef = doc(db, "reviews", review.id);
+
+    await updateDoc(reviewRef, {
+      comment: newComment.trim(),
+    });
+
+    setReviews((prevReviews) =>
+      prevReviews.map((item) =>
+        item.id === review.id
+          ? {
+              ...item,
+              comment: newComment.trim(),
+            }
+          : item
+      )
+    );
+
+    alert("Review updated successfully!");
+  } catch (error) {
+    console.error("Edit review error:", error);
+    alert("Failed to edit review.");
   }
 };
 
@@ -398,12 +475,12 @@ const handleSubmitQuestion = async () => {
               </div>
             </button>
 
-            <button
-              onClick={() => router.push("/checkout")}
-              className="bg-black text-white py-3 rounded-lg hover:bg-gray-800"
-            >
-              Buy Now
-            </button>
+           <button
+  onClick={handleBuyNow}
+  className="bg-black text-white py-3 rounded-lg hover:bg-gray-800"
+>
+  Buy Now
+</button>
             <button
                onClick={handlePinterestShare}
                 className="bg-red-600 text-white py-3 rounded-lg hover:bg-red-700"
@@ -671,7 +748,25 @@ const handleSubmitQuestion = async () => {
           <p className="text-gray-600 mt-3">
             {review.comment}
           </p>
+{user && review.userId === user.uid && (
+  <div className="flex gap-3 mt-4">
 
+    <button
+      onClick={() => handleEditReview(review)}
+      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+    >
+      ✏️ Edit
+    </button>
+
+    <button
+      onClick={() => handleDeleteReview(review.id)}
+      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+    >
+      🗑️ Delete
+    </button>
+
+  </div>
+)}
         </div>
 
       ))}
@@ -787,13 +882,15 @@ const handleSubmitQuestion = async () => {
         href={`/product/${item.id}`}
         className="border rounded-xl overflow-hidden shadow hover:shadow-lg transition"
       >
-        <Image
-          src={item.image}
-          alt={item.name}
-          width={300}
-          height={250}
-          className="w-full h-56 object-cover"
-        />
+        <div className="relative w-full h-56">
+          <Image
+            src={item.image}
+            alt={item.name}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-cover"
+         />
+           </div>
 
         <div className="p-4">
           <h3 className="font-bold">{item.name}</h3>
@@ -831,13 +928,15 @@ const handleSubmitQuestion = async () => {
             className="border rounded-xl overflow-hidden shadow hover:shadow-lg transition"
           >
 
-            <Image
-              src={item.image}
-              alt={item.name}
-              width={300}
-              height={250}
-              className="w-full h-56 object-cover"
-            />
+           <div className="relative w-full h-56">
+        <Image
+          src={item.image}
+          alt={item.name}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          className="object-cover"
+        />
+          </div>
 
             <div className="p-4">
 

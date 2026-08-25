@@ -1,5 +1,5 @@
 "use client";
-import { db } from "../lib/firebase";
+import { db, auth } from "../lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../hooks/useCart";
@@ -20,44 +20,74 @@ const [address, setAddress] = useState("");
 const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
 const handlePlaceOrder = async () => {
   try {
-   const orderId = `SHZ-${Date.now()}`;
-   await addDoc(collection(db, "orders"), {
-  userId: user?.uid,
-  email,
+    const currentUser = auth.currentUser;
 
-  fullName,
-  phone,
-  city,
-  postalCode,
-  country,
-  address,
+    if (!currentUser) {
+      throw new Error("User is not logged in.");
+    }
 
-  paymentMethod,
+    const orderId = `SHZ-${Date.now()}`;
 
-  products: cart,
+    const idTokenResult = await currentUser.getIdTokenResult(true);
 
-  totalItems,
-  totalPrice,
+    const idToken = idTokenResult.token;
 
-  orderId,
-  status: "Pending",
-  paymentStatus: "Pending",
-  trackingNumber: "",
 
-  createdAt: serverTimestamp(),
-});
-await fetch("/api/send-order-email", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    email,
-    fullName,
-    orderId,
-    totalPrice,
-  }),
-});
+    console.log("TOKEN CHECK:", {
+      issuedAt: idTokenResult.issuedAtTime,
+      expiration: idTokenResult.expirationTime,
+      now: new Date().toISOString(),
+    });
+
+ if (!idToken) {
+      throw new Error("Fresh authentication token not found.");
+    }
+    await addDoc(collection(db, "orders"), {
+      userId: currentUser.uid,
+      email,
+
+      fullName,
+      phone,
+      city,
+      postalCode,
+      country,
+      address,
+
+      paymentMethod,
+
+      products: cart,
+
+      totalItems,
+      totalPrice,
+
+      orderId,
+      status: "Pending",
+      paymentStatus: "Pending",
+      trackingNumber: "",
+
+      createdAt: serverTimestamp(),
+    });
+
+    const emailResponse = await fetch("/api/send-order-email", {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+
+      body: JSON.stringify({
+        orderId,
+      }),
+    });
+
+    const emailData = await emailResponse.json();
+
+    if (!emailResponse.ok) {
+      throw new Error(
+        emailData.error || "Order email failed."
+      );
+    }
 
     clearCart();
 

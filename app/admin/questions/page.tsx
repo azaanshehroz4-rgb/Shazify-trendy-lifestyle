@@ -54,8 +54,14 @@ useEffect(() => {
   }
 }, [user, loading, router]);
 useEffect(() => {
+  if (loading) return;
+
+  if (!user) return;
+
+  if (user.email !== ADMIN_EMAIL) return;
+
   fetchQuestions();
-}, []);
+}, [loading, user]);
 const saveAnswer = async (
   questionId: string,
   answer: string

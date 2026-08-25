@@ -4,7 +4,7 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 
 export default function MyQuestionsPage() {
@@ -18,22 +18,19 @@ useEffect(() => {
 
     if (!user) return;
 
-    const snapshot = await getDocs(
-      collection(db, "questions")
-    );
+   const questionsQuery = query(
+  collection(db, "questions"),
+  where("userId", "==", user.uid)
+);
 
-    const data = snapshot.docs
-      .map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
-      .filter(
-        (question: any) =>
-          question.userId === user.uid
-      );
+const snapshot = await getDocs(questionsQuery);
 
-    setQuestions(data);
+const data = snapshot.docs.map((doc) => ({
+  id: doc.id,
+  ...doc.data(),
+}));
 
+setQuestions(data);
   };
 
   fetchQuestions();

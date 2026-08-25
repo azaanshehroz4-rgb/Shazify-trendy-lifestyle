@@ -84,6 +84,16 @@ export default function MyOrdersPage() {
                 <p>
                   Total Price: ${order.totalPrice.toFixed(2)}
                 </p>
+
+<div className="mt-5">
+  <Link
+    href={`/account/orders/${order.id}`}
+    className="inline-block bg-pink-600 text-white px-6 py-3 rounded-xl hover:bg-pink-700 transition"
+  >
+    View Order & Track
+  </Link>
+</div>
+
                 <p className="mt-2 text-gray-500">
   Order Date:
   {order.createdAt?.seconds

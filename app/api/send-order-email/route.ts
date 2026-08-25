@@ -1,33 +1,108 @@
 import { NextResponse } from "next/server";
 import { resend } from "../../lib/resend";
+import { adminDb } from "../../lib/firebaseAdmin";
+import { getAuth } from "firebase-admin/auth";
 
 export async function POST(req: Request) {
   console.log("EMAIL API HIT");
-  try {
-    const body = await req.json();
 
-    const { email, fullName, orderId, totalPrice } = body;
+  try {
+    // Get Firebase ID token from request
+    const authorization = req.headers.get("authorization");
+
+    if (!authorization?.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const idToken = authorization.split("Bearer ")[1];
+
+    // Verify Firebase user
+    const decodedToken = await getAuth().verifyIdToken(idToken);
+
+    const userId = decodedToken.uid;
+
+    // Get only orderId from browser
+    const body = await req.json();
+    const { orderId } = body;
+
+    if (!orderId) {
+      return NextResponse.json(
+        { error: "Order ID is required." },
+        { status: 400 }
+      );
+    }
+
+    // Find order in Firestore
+    const orderSnapshot = await adminDb
+      .collection("orders")
+      .where("orderId", "==", orderId)
+      .limit(1)
+      .get();
+
+    if (orderSnapshot.empty) {
+      return NextResponse.json(
+        { error: "Order not found." },
+        { status: 404 }
+      );
+    }
+
+    const orderDoc = orderSnapshot.docs[0];
+    const order = orderDoc.data();
+
+    // Make sure this order belongs to logged-in user
+    if (order.userId !== userId) {
+      return NextResponse.json(
+        { error: "You are not allowed to access this order." },
+        { status: 403 }
+      );
+    }
+
+    // Use Firestore data, NOT browser-supplied data
+    const email = order.email;
+    const fullName = order.fullName;
+    const totalPrice = order.totalPrice;
+
+    if (!email) {
+      return NextResponse.json(
+        { error: "Order email is missing." },
+        { status: 400 }
+      );
+    }
 
     const data = await resend.emails.send({
-      
       from: "Shazify <onboarding@resend.dev>",
       to: email,
-      subject: `Order Confirmation - ${orderId}`,
+      subject: `Order Confirmation - ${order.orderId}`,
       html: `
         <div style="font-family:Arial,sans-serif;padding:30px;">
-          <h1 style="color:#e91e63;">Thank you for your order!</h1>
+          <h1 style="color:#e91e63;">
+            Thank you for your order!
+          </h1>
 
-          <p>Dear <strong>${fullName}</strong>,</p>
+          <p>
+            Dear <strong>${fullName}</strong>,
+          </p>
 
-          <p>Your order has been received successfully.</p>
+          <p>
+            Your order has been received successfully.
+          </p>
 
           <hr>
 
-          <p><strong>Order ID:</strong> ${orderId}</p>
+          <p>
+            <strong>Order ID:</strong> ${order.orderId}
+          </p>
 
-          <p><strong>Total:</strong> $${totalPrice}</p>
+          <p>
+            <strong>Total:</strong> $${totalPrice}
+          </p>
 
-          <p>Status: Pending</p>
+          <p>
+            <strong>Status:</strong> ${order.status}
+          </p>
 
           <hr>
 
@@ -39,9 +114,15 @@ export async function POST(req: Request) {
       `,
     });
 
-    return NextResponse.json(data);
+    console.log("RESEND RESPONSE:", data);
+
+    return NextResponse.json({
+      success: true,
+      data,
+    });
+
   } catch (error) {
-    console.error(error);
+    console.error("Order email error:", error);
 
     return NextResponse.json(
       { error: "Email failed" },

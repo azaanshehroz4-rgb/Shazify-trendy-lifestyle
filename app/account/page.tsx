@@ -131,6 +131,20 @@ if (!user) {
   </div>
 </Link>
 
+<Link href="/track-order">
+  <div className="border rounded-xl p-6 hover:shadow-lg transition cursor-pointer">
+    🚚
+
+    <h3 className="text-xl font-bold mt-4">
+      Track My Order
+    </h3>
+
+    <p className="text-gray-500 mt-2">
+      Track your order using your Order ID.
+    </p>
+  </div>
+</Link>
+
 <Link href="/account/reviews">
   <div className="border rounded-xl p-6 hover:shadow-lg transition cursor-pointer">
     ⭐

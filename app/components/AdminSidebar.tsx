@@ -27,6 +27,11 @@ export default function AdminSidebar() {
       href: "/admin/reviews",
       icon: "⭐",
     },
+      {
+      name: "Questions",
+      href: "/admin/questions",
+      icon: "❓",
+    },
   ];
 
   return (

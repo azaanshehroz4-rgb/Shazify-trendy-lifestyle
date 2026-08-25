@@ -2,40 +2,69 @@
 
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import Image from "next/image";
+import { useAuth } from "../../../context/AuthContext";
+
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
-
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const docRef = doc(db, "orders", id as string);
+  if (authLoading) return;
 
-        const docSnap = await getDoc(docRef);
+  if (!user) {
+    router.push(
+      `/login?redirect=/account/orders/${id}`
+    );
+    return;
+  }
 
-        if (docSnap.exists()) {
-          setOrder({
-            id: docSnap.id,
-            ...docSnap.data(),
-          });
-        }
-      } catch (error) {
-        console.error(error);
+  const fetchOrder = async () => {
+    try {
+      const docRef = doc(db, "orders", id as string);
+
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        setOrder(null);
+        setLoading(false);
+        return;
       }
 
-      setLoading(false);
-    };
+      const orderData = docSnap.data();
 
-    fetchOrder();
-  }, [id]);
+      // 🔐 Security: make sure this order belongs to
+      // the currently logged-in user.
+      if (orderData.userId !== user.uid) {
+        setOrder(null);
+        setLoading(false);
+        return;
+      }
+
+      setOrder({
+        id: docSnap.id,
+        ...orderData,
+      });
+
+    } catch (error) {
+      console.error("Order fetch error:", error);
+      setOrder(null);
+    }
+
+    setLoading(false);
+  };
+
+  fetchOrder();
+
+}, [id, user, authLoading, router]);
 
   return (
     <>
@@ -69,7 +98,7 @@ export default function OrderDetailsPage() {
             <p className="text-pink-600 font-bold">
               Total Price: ${order.totalPrice.toFixed(2)}
             </p>
-
+            
             <div className="mt-8 border rounded-xl p-6 bg-gray-50">
 
           <h3 className="text-xl font-bold mb-5">
