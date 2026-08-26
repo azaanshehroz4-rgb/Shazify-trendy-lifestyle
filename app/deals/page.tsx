@@ -5,14 +5,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { db } from "../lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
+import { formatPrice } from "../lib/currency";
 
 export default async function DealsPage() {
   const snapshot = await getDocs(collection(db, "products"));
 
-   const products = snapshot.docs.map((doc) => ({
-       id: doc.id,
-      ...doc.data(),
-     }));
+const products = snapshot.docs
+  .map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }))
+  .filter((product: any) => product.isDeal === true);
     return (
     <>
       <Navbar />
@@ -46,9 +49,11 @@ export default async function DealsPage() {
                   className="w-full h-64 object-cover"
                 />
 
-                <span className="absolute top-3 left-3 bg-red-600 text-white px-3 py-1 rounded-full text-sm">
-                  -20%
-                </span>
+                {product.isDeal && !product.affiliateLink && (
+                 <span className="absolute top-4 left-4 bg-pink-600 text-white text-xs px-3 py-1 rounded-full">
+                   -20%
+                 </span>
+               )}
 
               </div>
 
@@ -64,13 +69,13 @@ export default async function DealsPage() {
 
                 <div className="flex gap-3 mt-3">
 
-                  <span className="text-pink-600 font-bold text-xl">
-                    ${product.price}
-                  </span>
+                 <span className="text-pink-600 font-bold text-xl">
+                   {formatPrice(product.price)}
+                 </span>
 
-                  <span className="line-through text-gray-400">
-                    ${product.oldPrice}
-                  </span>
+                 <span className="line-through text-gray-400">
+                      {formatPrice(product.oldPrice)}
+                </span>
 
                 </div>
 

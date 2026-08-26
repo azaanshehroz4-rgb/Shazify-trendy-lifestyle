@@ -1,6 +1,6 @@
 "use client";
 
-
+import { formatPrice } from "../lib/currency";
 import {
   LineChart,
   Line,
@@ -24,7 +24,6 @@ export default function SalesChart({ data }: Props) {
       <h2 className="text-2xl font-bold mb-6">
         Sales Analytics
       </h2>
-      
 
       <ResponsiveContainer width="100%" height={350}>
         <LineChart data={data}>
@@ -32,9 +31,17 @@ export default function SalesChart({ data }: Props) {
 
           <XAxis dataKey="name" />
 
-          <YAxis />
+          <YAxis
+            tickFormatter={(value) =>
+              formatPrice(Number(value))
+            }
+          />
 
-          <Tooltip />
+          <Tooltip
+            formatter={(value) =>
+              formatPrice(Number(value))
+            }
+          />
 
           <Line
             type="monotone"

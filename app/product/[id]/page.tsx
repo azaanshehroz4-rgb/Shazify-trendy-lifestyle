@@ -97,11 +97,16 @@ export default async function ProductPage({
     return <div>Product not found.</div>;
   }
 
-  const product: any  = {
-    id: docSnap.id,
-    ...docSnap.data(),
-  };
+ const data = docSnap.data();
 
+const product: any = {
+  id: docSnap.id,
+  ...data,
+
+  createdAt: data.createdAt?.toDate
+    ? data.createdAt.toDate().toISOString()
+    : data.createdAt ?? null,
+};
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",

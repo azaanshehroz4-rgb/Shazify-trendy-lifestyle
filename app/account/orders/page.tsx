@@ -12,6 +12,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
+import { formatPrice } from "../../lib/currency";
 
 export default function MyOrdersPage() {
   const { user } = useAuth();
@@ -81,9 +82,9 @@ export default function MyOrdersPage() {
                   Total Items: {order.totalItems}
                 </p>
 
-                <p>
-                  Total Price: ${order.totalPrice.toFixed(2)}
-                </p>
+               <p>
+                 Total Price: {formatPrice(order.totalPrice)}
+              </p>
 
 <div className="mt-5">
   <Link
@@ -152,8 +153,8 @@ export default function MyOrdersPage() {
 
 
   <p className="font-bold text-pink-600">
-    ${product.price}
-  </p>
+  {formatPrice(product.price)}
+</p>
 
 </div>
   ))}

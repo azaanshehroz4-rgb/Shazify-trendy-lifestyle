@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../hooks/useCart";
-
+import { formatPrice } from "../lib/currency";
 export default function WishlistPage() {
   const {
     wishlist,
@@ -51,9 +51,9 @@ export default function WishlistPage() {
 
                   <p>{item.category}</p>
 
-                  <p className="text-pink-600 font-bold">
-                    ${item.price}
-                  </p>
+                <p className="text-pink-600 font-bold">
+                {formatPrice(item.price)}
+               </p>
                 </div>
               </div>
 

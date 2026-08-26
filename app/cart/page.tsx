@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCart } from "../hooks/useCart";
 import Link from "next/link";
+import { formatPrice } from "../lib/currency";
 export default function CartPage() {
   const {
     cart,
@@ -57,7 +58,7 @@ export default function CartPage() {
 
                   <p>{item.category}</p>
 
-                  <p>Price: ${item.price.toFixed(2)}</p>
+                <p>Price: {formatPrice(item.price)}</p>
 
                   <div className="flex items-center gap-3 mt-3">
                     <button
@@ -86,9 +87,9 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <div className="font-bold">
-               ${(item.price * item.quantity).toFixed(2)}
-              </div>
+             <div className="font-bold">
+                {formatPrice(item.price * item.quantity)}
+             </div>
             </div>
           ))}
 
@@ -102,9 +103,8 @@ export default function CartPage() {
             </p>
 
             <p className="mt-2">
-              Total Price: <strong>${totalPrice.toFixed(2)}</strong>
+               Total Price: <strong>{formatPrice(totalPrice)}</strong>
             </p>
-
             <div className="flex gap-4 mt-6">
               <button
                 onClick={clearCart}

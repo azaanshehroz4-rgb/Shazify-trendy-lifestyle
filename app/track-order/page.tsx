@@ -10,6 +10,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import { formatPrice } from "../lib/currency";
 
 export default function TrackOrderPage() {
   const { user, loading: authLoading } = useAuth();
@@ -113,8 +114,8 @@ if (!user) {
               Total Items: {order.totalItems}
             </p>
 
-            <p>
-              Total Price: ${order.totalPrice?.toFixed(2)}
+           <p>
+            Total Price: {formatPrice(order.totalPrice)}
             </p>
 
             <div className="mt-8 border-t pt-8">

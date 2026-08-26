@@ -23,6 +23,7 @@ updateDoc
 import { db } from "../../lib/firebase";
 import { useRecentlyViewed } from "../../context/RecentlyViewedContext";
 import { useAuth } from "../../context/AuthContext";
+import { formatPrice } from "../../lib/currency";
 
 export default function ProductDetails({
   product,
@@ -68,6 +69,7 @@ export default function ProductDetails({
   const [questionName, setQuestionName] = useState("");
   const [questionText, setQuestionText] = useState("");
   const [questionsLoading, setQuestionsLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(product.image);
 
   const fiveStar = reviews.filter(
   (review: any) => review.rating === 5
@@ -384,15 +386,48 @@ const handleEditReview = async (review: any) => {
     <div className="max-w-7xl mx-auto p-10">
       <div className="grid md:grid-cols-2 gap-10 items-center">
 
-        <div>
-          <Image
-            src={product.image}
-            alt={product.name}
-            width={500}
-            height={500}
-            className="rounded-xl border"
-          />
-        </div>
+       <div>
+  {/* Main Image */}
+  <div className="relative w-full h-[500px]">
+    <Image
+      src={selectedImage}
+      alt={product.name}
+      fill
+      sizes="(max-width: 768px) 100vw, 50vw"
+      className="object-contain rounded-xl border bg-white"
+    />
+  </div>
+
+  {/* Thumbnails */}
+  <div className="flex gap-3 mt-4 overflow-x-auto">
+
+    {(product.images?.length
+      ? product.images
+      : [product.image]
+    ).map((img: string, index: number) => (
+
+      <button
+        key={index}
+        onClick={() => setSelectedImage(img)}
+        className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 flex-shrink-0 ${
+          selectedImage === img
+            ? "border-pink-600"
+            : "border-gray-200"
+        }`}
+      >
+        <Image
+          src={img}
+          alt={`${product.name} ${index + 1}`}
+          fill
+          sizes="80px"
+          className="object-cover"
+        />
+      </button>
+
+    ))}
+
+  </div>
+</div>
 
         <div>
           <h1 className="text-4xl font-bold">{product.name}</h1>
@@ -406,13 +441,13 @@ const handleEditReview = async (review: any) => {
           </p>
 
           <div className="flex items-center gap-4 mt-4">
-            <span className="text-3xl font-bold text-pink-600">
-              ${product.price.toFixed(2)}
-            </span>
+           <span className="text-3xl font-bold text-pink-600">
+             {formatPrice(product.price)}
+           </span>
 
-            <span className="text-gray-400 line-through">
-              ${product.oldPrice.toFixed(2)}
-            </span>
+           <span className="text-gray-400 line-through">
+            {formatPrice(product.oldPrice)}
+           </span>
           </div>
 
           <p className="mt-6 text-gray-600">
@@ -420,38 +455,50 @@ const handleEditReview = async (review: any) => {
           </p>
 
           {/* Quantity */}
-          <div className="flex items-center gap-4 mt-8">
-
+          
+              {!product.affiliateLink && (
+                <div className="flex items-center gap-4 mt-8">
             <button
-              onClick={() =>
-                quantity > 1 && setQuantity(quantity - 1)
-              }
-              className="border p-2 rounded-lg"
-            >
-              <Minus size={18} />
-            </button>
+                    onClick={() =>
+                  quantity > 1 && setQuantity(quantity - 1)
+            }
+                className="border p-2 rounded-lg"
+              >
+                  <Minus size={18} />
+               </button>
 
-            <span className="text-xl font-bold">
-              {quantity}
-            </span>
+              <span className="text-xl font-bold">
+                {quantity}
+              </span>
 
-            <button
-              onClick={() => setQuantity(quantity + 1)}
-              className="border p-2 rounded-lg"
-            >
-              <Plus size={18} />
-            </button>
-
-          </div>
+                 <button
+                   onClick={() => setQuantity(quantity + 1)}
+                   className="border p-2 rounded-lg"
+              >
+                    <Plus size={18} />
+                </button>
+              </div>
+             )}
 
           <div className="flex flex-col gap-4 mt-8">
 
-            <button
-              onClick={handleAddToCart}
-              className="bg-pink-600 text-white py-3 rounded-lg hover:bg-pink-700"
+           {product.affiliateLink ? (
+            <a
+               href={product.affiliateLink}
+               target="_blank"
+               rel="noopener noreferrer nofollow"
+               className="bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition text-center font-semibold"
+            >
+                 🛍️ Buy on AliExpress
+            </a>
+           ) : (
+              <button
+                   onClick={handleAddToCart}
+                   className="bg-pink-600 text-white py-3 rounded-lg hover:bg-pink-700"
             >
               Add {quantity} To Cart
-            </button>
+              </button>
+            )}
 
             <button
              onClick={() => {
@@ -475,12 +522,14 @@ const handleEditReview = async (review: any) => {
               </div>
             </button>
 
-           <button
-  onClick={handleBuyNow}
-  className="bg-black text-white py-3 rounded-lg hover:bg-gray-800"
->
-  Buy Now
-</button>
+           {!product.affiliateLink && (
+            <button
+                onClick={handleBuyNow}
+                className="bg-black text-white py-3 rounded-lg hover:bg-gray-800"
+            >
+               Buy Now
+            </button>
+           )}
             <button
                onClick={handlePinterestShare}
                 className="bg-red-600 text-white py-3 rounded-lg hover:bg-red-700"
@@ -489,35 +538,51 @@ const handleEditReview = async (review: any) => {
             </button>
             
 
-              <div className="mt-8 space-y-3 border-t pt-6">
-
-  {product.stock === 0 ? (
-    <p className="text-red-600 font-semibold">
-      ❌ Out of Stock
+             {product.affiliateLink ? (
+  <div className="mt-8 space-y-3 border-t pt-6">
+    <p className="text-gray-600">
+      🛍️ Sold on AliExpress
     </p>
-  ) : product.stock <= 5 ? (
-    <p className="text-yellow-600 font-semibold">
-      ⚠️ {product.stock} Low Stock
+
+    <p className="text-gray-600">
+      🔗 Click "Buy on AliExpress" to view this product.
     </p>
-  ) : (
-    <p className="text-green-600 font-semibold">
-      ✅ {product.stock} In Stock
+
+    <p className="text-gray-600">
+      🔒 Secure purchase through AliExpress
     </p>
-  )}
+  </div>
+) : (
+  <div className="mt-8 space-y-3 border-t pt-6">
 
-  <p className="text-gray-600">
-    🚚 Free Shipping on orders over $50
-  </p>
+    {product.stock === 0 ? (
+      <p className="text-red-600 font-semibold">
+        ❌ Out of Stock
+      </p>
+    ) : product.stock <= 5 ? (
+      <p className="text-yellow-600 font-semibold">
+        ⚠️ {product.stock} Low Stock
+      </p>
+    ) : (
+      <p className="text-green-600 font-semibold">
+        ✅ {product.stock} In Stock
+      </p>
+    )}
 
-  <p className="text-gray-600">
-    🔒 100% Secure Checkout
-  </p>
+    <p className="text-gray-600">
+      🚚 Free Shipping on orders over $50
+    </p>
 
-  <p className="text-gray-600">
-    ↩️ Easy 3-Day Returns
-  </p>
+    <p className="text-gray-600">
+      🔒 100% Secure Checkout
+    </p>
 
-</div>
+    <p className="text-gray-600">
+      ↩️ Easy 3-Day Returns
+    </p>
+
+  </div>
+)}
                
 {/* Review Form */}
 <div className="mt-16 border-t pt-10">
@@ -895,10 +960,9 @@ const handleEditReview = async (review: any) => {
         <div className="p-4">
           <h3 className="font-bold">{item.name}</h3>
 
-          <p className="text-pink-600 font-bold mt-2">
-            ${item.price}
-
-          </p>
+         <p className="text-pink-600 font-bold mt-2">
+            {formatPrice(item.price)}
+         </p>
         </div>
       </Link>
     ))}
@@ -944,9 +1008,9 @@ const handleEditReview = async (review: any) => {
                 {item.name}
               </h3>
 
-              <p className="text-pink-600 font-bold mt-2">
-                ${item.price}
-              </p>
+             <p className="text-pink-600 font-bold mt-2">
+                {formatPrice(item.price)}
+             </p>
 
             </div>
 

@@ -1,5 +1,5 @@
 "use client";
-
+import { formatPrice } from "../lib/currency";
 type Props = {
   totalOrders: number;
   totalRevenue: number;
@@ -24,7 +24,7 @@ shippedOrders,
 deliveredOrders,
 }: Props) {
   return (
-   <div className="grid md:grid-cols-4 lg:grid-cols-8 gap-6">
+   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
 
       <div className="bg-pink-600 text-white rounded-xl p-6 shadow">
         <h2 className="text-lg">Total Orders</h2>
@@ -35,9 +35,9 @@ deliveredOrders,
 
       <div className="bg-green-600 text-white rounded-xl p-6 shadow">
         <h2 className="text-lg">Total Revenue</h2>
-        <p className="text-4xl font-bold mt-4">
-          ${totalRevenue.toFixed(2)}
-        </p>
+       <p className="text-4xl font-bold mt-4">
+           {formatPrice(totalRevenue)}
+      </p>
       </div>
 
       <div className="bg-blue-600 text-white rounded-xl p-6 shadow">
@@ -84,8 +84,8 @@ deliveredOrders,
   <h2 className="text-lg">Average Order</h2>
 
   <p className="text-4xl font-bold mt-4">
-    ${averageOrderValue.toFixed(2)}
-  </p>
+  {formatPrice(averageOrderValue)}
+</p>
 </div>
 
     </div>

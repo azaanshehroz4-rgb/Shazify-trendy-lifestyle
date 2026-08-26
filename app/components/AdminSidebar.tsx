@@ -50,7 +50,8 @@ export default function AdminSidebar() {
             href={item.href}
             className={`flex items-center gap-3 p-4 rounded-xl transition
             ${
-              pathname === item.href
+              pathname === item.href ||
+              (pathname.startsWith(`${item.href}/`) && item.href !== "/admin")
                 ? "bg-pink-600 text-white"
                 : "hover:bg-pink-100"
             }`}

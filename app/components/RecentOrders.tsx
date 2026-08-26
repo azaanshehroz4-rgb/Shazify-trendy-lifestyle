@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { formatPrice } from "../lib/currency";
 
 type Props = {
   orders: any[];
@@ -53,8 +54,8 @@ export default function RecentOrders({ orders }: Props) {
   </td>
 
   <td className="text-pink-600 font-bold">
-    ${order.totalPrice.toFixed(2)}
-  </td>
+  {formatPrice(order.totalPrice)}
+</td>
 
   <td>
     <span

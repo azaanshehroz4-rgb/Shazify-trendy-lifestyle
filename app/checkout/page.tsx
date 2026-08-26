@@ -6,6 +6,7 @@ import { useCart } from "../hooks/useCart";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { formatPrice, getUserCurrency } from "../lib/currency";
 export default function CheckoutPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -21,6 +22,7 @@ const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
 const handlePlaceOrder = async () => {
   try {
     const currentUser = auth.currentUser;
+    const currency = getUserCurrency();
 
     if (!currentUser) {
       throw new Error("User is not logged in.");
@@ -59,6 +61,7 @@ const handlePlaceOrder = async () => {
 
       totalItems,
       totalPrice,
+      currency,
 
       orderId,
       status: "Pending",
@@ -264,9 +267,9 @@ const handlePlaceOrder = async () => {
         </p>
       </div>
 
-      <p className="font-bold text-pink-600">
-        ${item.price * item.quantity}
-      </p>
+     <p className="font-bold text-pink-600">
+          {formatPrice(item.price * item.quantity)}
+     </p>
     </div>
   ))}
 </div>
@@ -277,7 +280,7 @@ const handlePlaceOrder = async () => {
 
           <p className="mb-6">
             Total Price:
-            <strong> ${totalPrice.toFixed(2)}</strong>
+            <strong> {formatPrice(totalPrice)}</strong>
           </p>
 
           <button

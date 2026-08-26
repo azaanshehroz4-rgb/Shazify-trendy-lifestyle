@@ -7,6 +7,7 @@ import { db } from "../../lib/firebase";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import Image from "next/image";
+import { formatPrice } from "../../lib/currency";
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
@@ -68,13 +69,13 @@ export default function OrderDetailsPage() {
             Total Items: {order.totalItems}
           </p>
 
-          <p className="text-pink-600 font-bold">
-            Total Price: ${order.totalPrice.toFixed(2)}
-          </p>
+         <p className="text-pink-600 font-bold">
+            Total Price: {formatPrice(order.totalPrice)}
+         </p>
 
-          <p className="text-green-600 font-semibold mt-2">
-            Status: Pending
-          </p>
+         <p className="text-green-600 font-semibold mt-2">
+             Status: {order.status}
+        </p>
 
           <div className="mt-8 space-y-6">
 
@@ -106,9 +107,9 @@ export default function OrderDetailsPage() {
                     Quantity: {product.quantity}
                   </p>
 
-                  <p className="text-pink-600 font-bold">
-                    ${product.price}
-                  </p>
+                 <p className="text-pink-600 font-bold">
+                   {formatPrice(product.price)}
+                 </p>
 
                 </div>
 

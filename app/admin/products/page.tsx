@@ -15,6 +15,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation"
 import AdminSidebar from "../../components/AdminSidebar";
 import { logActivity } from "../../lib/activityLogger";
+import { formatPrice } from "../../lib/currency";
 
 export default function AdminProductsPage() {
   const { user, loading } = useAuth();
@@ -272,9 +273,9 @@ return (
             {product.category}
           </td>
 
-          <td className="p-3 text-pink-600 font-bold">
-            ${product.price}
-          </td>
+         <td className="p-3 text-pink-600 font-bold">
+           {formatPrice(product.price)}
+        </td>
 
           <td className="p-3">
             ⭐ {product.rating}

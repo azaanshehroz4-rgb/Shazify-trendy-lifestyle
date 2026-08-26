@@ -8,7 +8,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import Image from "next/image";
 import { useAuth } from "../../../context/AuthContext";
-
+import { formatPrice } from "../../../lib/currency";
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
@@ -95,8 +95,8 @@ export default function OrderDetailsPage() {
               Total Items: {order.totalItems}
             </p>
 
-            <p className="text-pink-600 font-bold">
-              Total Price: ${order.totalPrice.toFixed(2)}
+           <p className="text-pink-600 font-bold">
+              Total Price: {formatPrice(order.totalPrice)}
             </p>
             
             <div className="mt-8 border rounded-xl p-6 bg-gray-50">
@@ -191,9 +191,9 @@ export default function OrderDetailsPage() {
 
                </div>
 
-                  <p className="font-bold text-pink-600">
-                    ${product.price}
-                  </p>
+                 <p className="font-bold text-pink-600">
+                   {formatPrice(product.price)}
+                </p>
                 </div>
               ))}
               <div className="mt-8 border-t pt-6">

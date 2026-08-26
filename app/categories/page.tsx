@@ -4,13 +4,7 @@ import Link from "next/link";
 import { db } from "../lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
-const categories = [
-  "Fashion",
-  "Electronics",
-  "Beauty",
-  "Home",
-  "Sports",
-];
+
 
 export default async function CategoriesPage() {
   const snapshot = await getDocs(collection(db, "products"));

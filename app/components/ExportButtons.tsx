@@ -7,6 +7,7 @@ import { saveAs } from "file-saver";
 type Props = {
   orders: any[];
 };
+import { formatPrice } from "../lib/currency";
 export default function ExportButtons({ orders }: Props) {
  const exportPDF = () => {
   const doc = new jsPDF();

@@ -8,6 +8,7 @@ import { db } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
 import Image from "next/image";
 import Link from "next/link";
+import { formatPrice } from "../lib/currency";
 export default function OrdersPage() {
 const { user } = useAuth();
 
@@ -78,9 +79,9 @@ useEffect(() => {
       Total Items: {order.totalItems}
     </p>
 
-    <p className="text-pink-600 font-bold mt-2">
-      Total: ${order.totalPrice.toFixed(2)}
-    </p>
+   <p className="text-pink-600 font-bold mt-2">
+  Total: {formatPrice(order.totalPrice)}
+   </p>
 
     <p className="text-green-600 mt-3 font-semibold">
       Status: Pending
@@ -107,8 +108,8 @@ useEffect(() => {
           </p>
 
           <p className="text-pink-600 font-semibold">
-            ${product.price}
-          </p>
+          {formatPrice(product.price)}
+         </p>
         </div>
       </div>
     ))}

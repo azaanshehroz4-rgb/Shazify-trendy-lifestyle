@@ -74,16 +74,28 @@ export default function AccountSettingsPage() {
   Change Password
 </button>
 </div>
-          <div className="border rounded-xl p-6">
-            <h2 className="text-xl font-bold">
-              🛡️ Security
-            </h2>
+         <div
+  onClick={() => router.push("/account/settings/security")}
+  className="border rounded-xl p-6 cursor-pointer hover:shadow-md hover:border-pink-500 transition"
+>
+  <h2 className="text-xl font-bold">
+    🛡️ Security
+  </h2>
 
-            <p className="text-gray-500 mt-2">
-              Manage your account security.
-            </p>
-          </div>
+  <p className="text-gray-500 mt-2">
+    Manage your account security.
+  </p>
 
+  <button
+    onClick={(e) => {
+      e.stopPropagation();
+      router.push("/account/settings/security");
+    }}
+    className="mt-4 bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700 transition"
+  >
+    Security Settings
+  </button>
+</div>
         </div>
 
       </div>

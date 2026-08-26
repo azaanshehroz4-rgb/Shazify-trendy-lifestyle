@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPrice } from "../lib/currency";
+
 type Props = {
   orders: any[];
 };
@@ -30,7 +32,7 @@ export default function LatestActivity({ orders }: Props) {
             </p>
 
             <p className="text-pink-600 font-bold">
-              ${order.totalPrice.toFixed(2)}
+              {formatPrice(order.totalPrice)}
             </p>
 
           </div>

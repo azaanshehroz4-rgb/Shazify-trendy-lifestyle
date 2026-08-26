@@ -3,6 +3,7 @@ import Image from "next/image";
 import { db } from "../../lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import type { Metadata } from "next";
+import { formatPrice } from "../../lib/currency";
 
 const SITE_URL = "https://www.shazify.com";
 export async function generateMetadata({
@@ -109,8 +110,8 @@ export default async function CategoryPage({
             </h2>
 
             <p className="text-pink-600 font-bold mt-2">
-              ${product.price}
-            </p>
+               {formatPrice(product.price)}
+           </p>
           </Link>
         ))}
 

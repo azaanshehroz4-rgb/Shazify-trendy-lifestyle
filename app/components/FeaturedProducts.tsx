@@ -9,6 +9,7 @@ import { useCart } from "../hooks/useCart";
 import { useSearch } from "../context/SearchContext";
 import { useWishlist } from "../context/WishlistContext";
 import Link from "next/link";
+import { formatPrice } from "../lib/currency";
 export default function FeaturedProducts() {
   const [products, setProducts] = useState<any[]>([]);
    const { addToCart } = useCart()
@@ -88,6 +89,10 @@ return (
           >
             {/* Image */}
             <div className="relative h-72 overflow-hidden">
+               <Link
+                  href={`/product/${product.id}`}
+                 className="relative block w-full h-full"
+               >
                  
               <Image
                 src={product.image}
@@ -96,11 +101,9 @@ return (
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className="object-cover group-hover:scale-110 transition duration-500"
               />
+              </Link> 
 
-              {/* Discount Badge */}
-              <span className="absolute top-4 left-4 bg-pink-600 text-white text-xs px-3 py-1 rounded-full">
-                -20%
-              </span>
+             
 
               {/* Icons */}
               <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition">
@@ -130,15 +133,19 @@ return (
             </div>
 
             {/* Content */}
-            <div className="p-5">
-
+           <div className="p-5">
+           <Link
+             href={`/product/${product.id}`}
+            className="block group/product"
+           >
               <p className="text-gray-500 text-sm">
-                {product.category}
-              </p>
+               {product.category}
+           </p>
 
-              <h3 className="font-bold text-xl mt-1">
-                {product.name}
-              </h3>
+             <h3 className="font-bold text-xl mt-1 group-hover/product:text-pink-600 transition">
+              {product.name}
+             </h3>
+            </Link>
 
               {/* Rating */}
               <div className="flex items-center mt-3 text-yellow-500">
@@ -169,38 +176,39 @@ return (
 </div>
 
               {/* Price */}
-              <div className="flex items-center gap-3 mt-4">
+<div className="flex items-center gap-3 mt-4">
 
-                <span className="text-pink-600 text-2xl font-bold">
-                  ${product.price}
-                </span>
+  <span className="text-pink-600 text-2xl font-bold">
+    {formatPrice(product.price)}
+  </span>
 
-                <span className="line-through text-gray-400">
-                  ${product.oldPrice}
-                </span>
+  <span className="line-through text-gray-400">
+    {formatPrice(product.oldPrice)}
+  </span>
 
-              </div>
+</div>
+             
 
-              {/* Button */}
-              <button
-                 onClick={() => handleAddToCart(product)}
-                className="w-full mt-6 bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 transition flex items-center justify-center gap-2"
-              >
-                <ShoppingCart size={18} />
-                
-                Add To Cart
-                
-              </button>
-              {product.affiliateLink && (
-  <a
-    href={product.affiliateLink}
-    target="_blank"
-    rel="noopener noreferrer nofollow"
-    className="w-full mt-3 bg-orange-500 text-white py-3 rounded-xl hover:bg-orange-600 transition flex items-center justify-center font-semibold"
-  >
-    🛍️ Buy on AliExpress
-  </a>
-)}
+              {/* Product Action Button */}
+
+                {product.affiliateLink ? (
+             <a
+               href={product.affiliateLink}
+               target="_blank"
+               rel="noopener noreferrer nofollow"
+               className="w-full mt-6 bg-orange-500 text-white py-3 rounded-xl hover:bg-orange-600 transition flex items-center justify-center font-semibold"
+             >
+                   🛍️ Buy on AliExpress
+             </a>
+                 ) : (
+            <button
+               onClick={() => handleAddToCart(product)}
+               className="w-full mt-6 bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 transition flex items-center justify-center gap-2"
+             >
+               <ShoppingCart size={18} />
+              Add To Cart
+             </button>
+           )}
 
             </div>
           </div>

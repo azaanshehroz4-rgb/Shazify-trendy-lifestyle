@@ -10,6 +10,7 @@ import { updateDoc } from "firebase/firestore";
 import { useAuth } from "../../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { logActivity } from "../../../lib/activityLogger";
+import { formatPrice } from "../../../lib/currency";
 
 export default function AdminOrderDetailsPage() {
   const { user } = useAuth();
@@ -154,9 +155,9 @@ const saveTrackingInfo = async () => {
 
 </div>
 
-      <p className="text-pink-600 font-bold mt-2">
-        Total: ${order.totalPrice.toFixed(2)}
-      </p>
+     <p className="text-pink-600 font-bold mt-2">
+         Total: {formatPrice(order.totalPrice)}
+     </p>
 
       <p className="text-gray-600">
         Total Items: {order.totalItems}
@@ -227,10 +228,9 @@ const saveTrackingInfo = async () => {
 
 </div>
 
-        <p className="font-bold text-pink-600">
-          ${item.price}
-        </p>
-
+       <p className="font-bold text-pink-600">
+             {formatPrice(item.price)}
+       </p>
       </div>
 
     ))}

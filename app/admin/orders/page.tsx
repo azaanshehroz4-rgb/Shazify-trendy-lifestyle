@@ -18,6 +18,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import AdminSidebar from "../../components/AdminSidebar";
 import { logActivity } from "../../lib/activityLogger";
+import { formatPrice } from "../../lib/currency";
 
 export default function AdminOrdersPage() {
 
@@ -160,8 +161,8 @@ const updateOrderStatus = async (
   </div>
 </td>
 
-<td className="p-4">
-  ${order.totalPrice}
+<td className="p-4 font-semibold">
+  {formatPrice(order.totalPrice)}
 </td>
 
 <td className="p-4">
