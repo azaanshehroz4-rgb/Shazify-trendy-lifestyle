@@ -58,60 +58,65 @@ export default function Hero() {
         </div>
       </div>
 
+{/* Mobile Banner */}
+<div className="md:hidden relative w-full bg-black">
 
-      {/* Mobile Banner */}
-      <div className="md:hidden relative w-full min-h-[600px]">
+  <div className="relative w-full aspect-[9/16]">
+    <Image
+      src="/images/hero-banner-mobile.png"
+      alt="Shazify Mobile Hero Banner"
+      fill
+      priority
+      sizes="100vw"
+      className="object-contain"
+    />
 
-        <Image
-          src="/images/hero-banner-mobile.png"
-          alt="Shazify Mobile Hero Banner"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
+    {/* Dark overlay */}
+    <div className="absolute inset-0 bg-black/25"></div>
 
-        <div className="absolute inset-0 bg-black/35"></div>
+    {/* Mobile Content */}
+    <div className="absolute inset-0 z-10 flex items-center">
+      <div className="w-full px-5 text-white">
 
-        <div className="relative z-10 flex min-h-[600px] items-center">
-          <div className="w-full px-5 text-white">
+        <p className="uppercase tracking-[3px] text-pink-400 font-semibold text-xs mb-3">
+          NEW COLLECTION 2026
+        </p>
 
-            <p className="uppercase tracking-[3px] text-pink-400 font-semibold text-xs mb-3">
-              NEW COLLECTION 2026
-            </p>
+        <h1 className="text-4xl font-extrabold leading-[1.05]">
+          Discover Your
+          <span className="block text-pink-500">
+            Perfect Style
+          </span>
+        </h1>
 
-            <h1 className="text-4xl font-extrabold leading-tight">
-              Discover Your
-              <span className="block text-pink-500">
-                Perfect Style
-              </span>
-            </h1>
+        <p className="mt-4 text-sm text-gray-200 max-w-xs">
+          Shop premium fashion, beauty and lifestyle products.
+        </p>
 
-            <p className="mt-4 text-sm text-gray-200 max-w-xs">
-              Shop premium fashion, beauty and lifestyle products.
-            </p>
+        <div className="mt-6 flex gap-3">
 
-            <div className="mt-6 flex gap-3">
-              <Link
-                href="/deals"
-                className="bg-pink-600 text-white px-5 py-3 rounded-lg text-sm font-medium"
-              >
-                Shop Now
-              </Link>
+          <Link
+            href="/deals"
+            className="bg-pink-600 text-white px-5 py-3 rounded-lg text-sm font-medium hover:bg-pink-700 transition"
+          >
+            Shop Now
+          </Link>
 
-              <Link
-                href="/categories"
-                className="border border-white px-5 py-3 rounded-lg text-sm font-medium"
-              >
-                Explore
-              </Link>
-            </div>
+          <Link
+            href="/categories"
+            className="border border-white px-5 py-3 rounded-lg text-sm font-medium hover:bg-white hover:text-black transition"
+          >
+            Explore
+          </Link>
 
-          </div>
         </div>
 
       </div>
+    </div>
 
+  </div>
+
+</div>
     </section>
   );
 }
