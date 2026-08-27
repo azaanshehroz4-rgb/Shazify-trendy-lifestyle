@@ -9,8 +9,6 @@ import { useAuth } from "../../../context/AuthContext";
 import { useEffect, useState, useRef } from "react";
 import { logActivity } from "../../../lib/activityLogger";
 
-
-
 export default function AddProductPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
@@ -20,8 +18,10 @@ export default function AddProductPage() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
 
+  // Prices are entered in PKR
   const [price, setPrice] = useState("");
   const [oldPrice, setOldPrice] = useState("");
+
   const [rating, setRating] = useState("");
   const [description, setDescription] = useState("");
 
@@ -36,12 +36,12 @@ export default function AddProductPage() {
   const [isDeal, setIsDeal] = useState(false);
 
   // Images
- const [images, setImages] = useState<string[]>([
-  "",
-  "",
-  "",
-  "",
-]);
+  const [images, setImages] = useState<string[]>([
+    "",
+    "",
+    "",
+    "",
+  ]);
 
   const [uploading, setUploading] = useState(false);
   const submittingRef = useRef(false);
@@ -69,28 +69,31 @@ export default function AddProductPage() {
   // Image Selection
   // --------------------------------
 
- const handleImageChange = (
-  index: number,
-  value: string
-) => {
-  setImages((prev) => {
-    const updated = [...prev];
-    updated[index] = value;
-    return updated;
-  });
-};
+  const handleImageChange = (
+    index: number,
+    value: string
+  ) => {
+    setImages((prev) => {
+      const updated = [...prev];
+      updated[index] = value;
+      return updated;
+    });
+  };
 
   // --------------------------------
   // Add Product
   // --------------------------------
 
   const handleAddProduct = async () => {
-     if (submittingRef.current) {
-    return;
-  }
+    // Prevent double submission
+    if (submittingRef.current) {
+      return;
+    }
 
-  submittingRef.current = true;
+    // --------------------------------
     // Basic validation
+    // --------------------------------
+
     if (!name.trim()) {
       alert("Please enter product name.");
       return;
@@ -101,109 +104,99 @@ export default function AddProductPage() {
       return;
     }
 
-    if (!price) {
-      alert("Please enter product price.");
+    if (!price || Number(price) <= 0) {
+      alert("Please enter a valid product price in PKR.");
       return;
     }
 
-    if (!oldPrice) {
-      alert("Please enter old price.");
+    if (!oldPrice || Number(oldPrice) <= 0) {
+      alert("Please enter a valid old price in PKR.");
       return;
     }
 
-    if (Number(rating) < 1 || Number(rating) > 5) {
+    if (Number(oldPrice) < Number(price)) {
+      alert("Old price should be greater than or equal to the current price.");
+      return;
+    }
+
+    if (!rating || Number(rating) < 1 || Number(rating) > 5) {
       alert("Rating must be between 1 and 5.");
       return;
     }
 
+    if (!stock || Number(stock) < 0) {
+      alert("Please enter valid stock quantity.");
+      return;
+    }
+
     // Remove empty image slots
-   const cleanImages = images
-  .map((img) => img.trim())
-  .filter((img) => img !== "");
+    const cleanImages = images
+      .map((img) => img.trim())
+      .filter((img) => img !== "");
 
-if (cleanImages.length === 0) {
-  alert("Please enter at least one product image path.");
-  return;
-}
+    if (cleanImages.length === 0) {
+      alert("Please enter at least one product image path.");
+      return;
+    }
 
-    try {
+   
+      submittingRef.current = true;
+       try {
       setUploading(true);
-
-      // --------------------------------
-      // Upload Images
-      // --------------------------------
-
-     await addDoc(collection(db, "products"), {
-  name: name.trim(),
-  category: category.trim(),
-
-  // Main image
-  image: cleanImages[0],
-
-  // All product images
-  images: cleanImages,
-
-  price: Number(price),
-  oldPrice: Number(oldPrice),
-  rating: Number(rating),
-  stock: Number(stock),
-
-  description: description.trim(),
-
-  pinterestTitle: pinterestTitle.trim(),
-  pinterestDescription: pinterestDescription.trim(),
-
-  affiliateLink: affiliateLink.trim(),
-
-  isDeal,
-
-  createdAt: new Date(),
-});
 
       // --------------------------------
       // Save Product
       // --------------------------------
 
       await addDoc(collection(db, "products"), {
-  name: name.trim(),
-  category: category.trim(),
+        name: name.trim(),
+        category: category.trim(),
 
-  // Main image
-  image: cleanImages[0],
+        // Main image
+        image: cleanImages[0],
 
-  // All product images
-  images: cleanImages,
+        // All product images
+        images: cleanImages,
 
-  price: Number(price),
-  oldPrice: Number(oldPrice),
-  rating: Number(rating),
-  stock: Number(stock),
+        // --------------------------------
+        // PRICE SYSTEM
+        // Base price is PKR
+        // --------------------------------
 
-  description: description.trim(),
+        price: Number(price),
+        oldPrice: Number(oldPrice),
+        currency: "PKR",
 
-  pinterestTitle: pinterestTitle.trim(),
-  pinterestDescription: pinterestDescription.trim(),
+        rating: Number(rating),
+        stock: Number(stock),
 
-  affiliateLink: affiliateLink.trim(),
+        description: description.trim(),
 
-  // Deals
-  isDeal,
+        pinterestTitle: pinterestTitle.trim(),
+        pinterestDescription: pinterestDescription.trim(),
 
-  createdAt: new Date(),
-});
+        affiliateLink: affiliateLink.trim(),
+
+        // Deals
+        isDeal,
+
+        createdAt: new Date(),
+      });
 
       await logActivity(`Product Added: ${name}`);
 
       alert("Product Added Successfully!");
 
       router.push("/admin/products");
+
     } catch (error) {
       console.error("Add product error:", error);
 
       alert("Failed to add product.");
+
     } finally {
       setUploading(false);
-       submittingRef.current = false;
+      submittingRef.current = false;
     }
   };
 
@@ -245,78 +238,96 @@ if (cleanImages.length === 0) {
               className="w-full border p-3 rounded-lg"
             />
 
-            {/* -------------------------------- */}
             {/* Product Images */}
-            {/* -------------------------------- */}
 
-           {/* Product Images */}
+            <div className="border rounded-xl p-5">
 
-<div className="border rounded-xl p-5">
+              <h2 className="font-bold text-xl mb-2">
+                Product Images
+              </h2>
 
-  <h2 className="font-bold text-xl mb-2">
-    Product Images
-  </h2>
+              <p className="text-gray-500 text-sm mb-5">
+                Enter up to 4 images from public/images folder.
+                The first image will be the main product image.
+              </p>
 
-  <p className="text-gray-500 text-sm mb-5">
-    Enter up to 4 images from public/images folder.
-    The first image will be the main product image.
+              {images.map((img, index) => (
+                <div key={index} className="mb-5">
+
+                  <label className="block font-semibold mb-2">
+                    {index === 0
+                      ? "Main Product Image"
+                      : `Product Image ${index + 1}`}
+                  </label>
+
+                  <input
+                    type="text"
+                    value={img}
+                    onChange={(e) =>
+                      handleImageChange(index, e.target.value)
+                    }
+                    placeholder="/images/product4.jpg"
+                    className="w-full border p-3 rounded-lg"
+                  />
+
+                  {img && (
+                    <div className="mt-3">
+
+                      <img
+                        src={img}
+                        alt={`Product image ${index + 1}`}
+                        className="w-32 h-32 object-cover rounded-lg border"
+                      />
+
+                    </div>
+                  )}
+
+                </div>
+              ))}
+
+            </div>
+
+{/* Price */}
+
+<div>
+  <label className="block font-semibold mb-2">
+    Price (PKR)
+  </label>
+
+  <input
+    type="number"
+    placeholder="Example: 7000"
+    value={price}
+    onChange={(e) => setPrice(e.target.value)}
+    min="0"
+    className="w-full border p-3 rounded-lg"
+  />
+
+  <p className="text-sm text-gray-500 mt-1">
+    Enter product price in Pakistani Rupees.
   </p>
-
-  {images.map((img, index) => (
-    <div key={index} className="mb-5">
-
-      <label className="block font-semibold mb-2">
-        {index === 0
-          ? "Main Product Image"
-          : `Product Image ${index + 1}`}
-      </label>
-
-      <input
-        type="text"
-        value={img}
-        onChange={(e) =>
-          handleImageChange(index, e.target.value)
-        }
-        placeholder="/images/product4.jpg"
-        className="w-full border p-3 rounded-lg"
-      />
-
-      {img && (
-        <div className="mt-3">
-
-          <img
-            src={img}
-            alt={`Product image ${index + 1}`}
-            className="w-32 h-32 object-cover rounded-lg border"
-          />
-
-        </div>
-      )}
-
-    </div>
-  ))}
-
 </div>
-            {/* Price */}
 
-            <input
-              type="number"
-              placeholder="Price"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className="w-full border p-3 rounded-lg"
-            />
+{/* Old Price */}
 
-            {/* Old Price */}
+<div>
+  <label className="block font-semibold mb-2">
+    Old Price (PKR)
+  </label>
 
-            <input
-              type="number"
-              placeholder="Old Price"
-              value={oldPrice}
-              onChange={(e) => setOldPrice(e.target.value)}
-              className="w-full border p-3 rounded-lg"
-            />
+  <input
+    type="number"
+    placeholder="Example: 8500"
+    value={oldPrice}
+    onChange={(e) => setOldPrice(e.target.value)}
+    min="0"
+    className="w-full border p-3 rounded-lg"
+  />
 
+  <p className="text-sm text-gray-500 mt-1">
+    Enter original/old price in Pakistani Rupees.
+  </p>
+</div>
             {/* Rating */}
 
             <input
@@ -444,7 +455,7 @@ if (cleanImages.length === 0) {
               className="w-full bg-pink-600 text-white py-3 rounded-xl hover:bg-pink-700 disabled:opacity-50"
             >
               {uploading
-                ? "Uploading Images..."
+                ? "Saving Product..."
                 : "Save Product"}
             </button>
 

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -34,17 +35,23 @@ export default function Hero() {
               Shop premium fashion, beauty and lifestyle products.
             </p>
                     
-            <div className="mt-8 flex gap-4">
+           <div className="mt-8 flex gap-4">
 
-              <button className="bg-pink-600 text-white px-8 py-3 rounded-lg">
-                Shop Now
-              </button>
+             <Link
+                  href="/deals"
+                  className="bg-pink-600 text-white px-8 py-3 rounded-lg hover:bg-pink-700 transition"
+            >
+                  Shop Now
+               </Link>
 
-              <button className="border border-white px-8 py-3 rounded-lg">
-                Explore
-              </button>
+            <Link
+                  href="/categories"
+                  className="border border-white px-8 py-3 rounded-lg hover:bg-white hover:text-black transition"
+            >
+                 Explore
+               </Link>
 
-            </div>
+             </div>
 
           </div>
 

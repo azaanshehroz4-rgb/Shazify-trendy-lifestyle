@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Categories() {
   return (
     <section className="max-w-7xl mx-auto py-20 px-6">
@@ -17,29 +19,53 @@ export default function Categories() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
 
-        <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-2xl hover:-translate-y-2 transition duration-300 cursor-pointer">
+        {/* Fashion */}
+        <Link
+          href="/category/Fashion"
+          className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-2xl hover:-translate-y-2 transition duration-300 cursor-pointer block"
+        >
           <div className="text-5xl mb-4">👗</div>
           <h3 className="text-xl font-bold">Fashion</h3>
-          <p className="text-gray-500 mt-2">Latest trendy outfits</p>
-        </div>
+          <p className="text-gray-500 mt-2">
+            Latest trendy outfits
+          </p>
+        </Link>
 
-        <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-2xl hover:-translate-y-2 transition duration-300 cursor-pointer">
+        {/* Beauty */}
+        <Link
+          href="/category/Beauty"
+          className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-2xl hover:-translate-y-2 transition duration-300 cursor-pointer block"
+        >
           <div className="text-5xl mb-4">💄</div>
           <h3 className="text-xl font-bold">Beauty</h3>
-          <p className="text-gray-500 mt-2">Premium cosmetics</p>
-        </div>
+          <p className="text-gray-500 mt-2">
+            Premium cosmetics
+          </p>
+        </Link>
 
-        <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-2xl hover:-translate-y-2 transition duration-300 cursor-pointer">
+        {/* Electronics */}
+        <Link
+          href="/category/Electronics"
+          className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-2xl hover:-translate-y-2 transition duration-300 cursor-pointer block"
+        >
           <div className="text-5xl mb-4">📱</div>
           <h3 className="text-xl font-bold">Electronics</h3>
-          <p className="text-gray-500 mt-2">Smart gadgets</p>
-        </div>
+          <p className="text-gray-500 mt-2">
+            Smart gadgets
+          </p>
+        </Link>
 
-        <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-2xl hover:-translate-y-2 transition duration-300 cursor-pointer">
+        {/* Home */}
+        <Link
+          href="/category/Home"
+          className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-2xl hover:-translate-y-2 transition duration-300 cursor-pointer block"
+        >
           <div className="text-5xl mb-4">🏠</div>
           <h3 className="text-xl font-bold">Home</h3>
-          <p className="text-gray-500 mt-2">Modern home essentials</p>
-        </div>
+          <p className="text-gray-500 mt-2">
+            Modern home essentials
+          </p>
+        </Link>
 
       </div>
     </section>

@@ -14,11 +14,21 @@ const products: any[] = snapshot.docs.map((doc) => ({
   ...doc.data(),
 }));
 
-const categories = [
-  ...new Set(
-    products.map((product) => product.category)
-  ),
-];
+const categoriesMap = new Map<string, string>();
+
+products.forEach((product) => {
+  const category = product.category?.trim();
+
+  if (!category) return;
+
+  const normalizedCategory = category.toLowerCase();
+
+  if (!categoriesMap.has(normalizedCategory)) {
+    categoriesMap.set(normalizedCategory, category);
+  }
+});
+
+const categories = Array.from(categoriesMap.values());
   return (
     <>
       <Navbar />

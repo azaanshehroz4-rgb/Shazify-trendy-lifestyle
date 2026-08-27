@@ -1,8 +1,12 @@
 export type Currency = "USD" | "PKR";
 
+// --------------------------------
+// Get user's currency
+// --------------------------------
+
 export function getUserCurrency(): Currency {
   if (typeof window === "undefined") {
-    return "USD";
+    return "PKR";
   }
 
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -14,27 +18,35 @@ export function getUserCurrency(): Currency {
   return "USD";
 }
 
+// --------------------------------
+// Convert PKR → selected currency
+// --------------------------------
+
 export function convertPrice(
-  priceUSD: number,
+  pricePKR: number,
   currency: Currency
 ): number {
-  if (currency === "PKR") {
+  if (currency === "USD") {
     const exchangeRate = 280;
 
-    return priceUSD * exchangeRate;
+    return pricePKR / exchangeRate;
   }
 
-  return priceUSD;
+  return pricePKR;
 }
 
+// --------------------------------
+// Format Price
+// --------------------------------
+
 export function formatPrice(
-  priceUSD: number,
+  pricePKR: number,
   currency?: Currency
 ): string {
   const selectedCurrency = currency || getUserCurrency();
 
   const convertedPrice = convertPrice(
-    priceUSD,
+    pricePKR,
     selectedCurrency
   );
 
