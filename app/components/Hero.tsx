@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
 export default function Hero() {
@@ -21,11 +21,11 @@ export default function Hero() {
   const [exploreLink, setExploreLink] = useState("/categories");
 
   useEffect(() => {
-    const loadHeroSettings = async () => {
-      try {
-        const heroRef = doc(db, "settings", "hero");
-        const heroSnap = await getDoc(heroRef);
+    const heroRef = doc(db, "settings", "hero");
 
+    const unsubscribe = onSnapshot(
+      heroRef,
+      (heroSnap) => {
         if (heroSnap.exists()) {
           const data = heroSnap.data();
 
@@ -62,18 +62,23 @@ export default function Hero() {
             data.exploreLink || "/categories"
           );
         }
-      } catch (error) {
-        console.error("Error loading hero settings:", error);
+      },
+      (error) => {
+        console.error(
+          "Error loading hero settings:",
+          error
+        );
       }
-    };
+    );
 
-    loadHeroSettings();
+    return () => unsubscribe();
   }, []);
 
   return (
     <section className="relative w-full overflow-hidden">
 
       {/* ==================== DESKTOP BANNER ==================== */}
+
       <div className="hidden md:block relative w-full h-[80vh] min-h-[600px]">
 
         <Image
@@ -86,35 +91,43 @@ export default function Hero() {
         />
 
         {/* Desktop Dark Overlay */}
+
         <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/10"></div>
 
         {/* Desktop Content */}
+
         <div className="relative z-10 flex h-full items-center">
 
           <div className="w-full max-w-7xl mx-auto px-12">
 
             <div className="max-w-xl text-white">
 
-              {/* Collection Text */}
+              {/* Small Title */}
+
               <p className="uppercase tracking-[4px] text-pink-400 font-semibold mb-3">
                 {smallTitle}
               </p>
 
               {/* Heading */}
+
               <h1 className="text-5xl md:text-7xl font-extrabold leading-tight">
+
                 {headingLine1}
 
                 <span className="block text-pink-500">
                   {headingLine2}
                 </span>
+
               </h1>
 
               {/* Description */}
+
               <p className="mt-6 text-lg text-gray-200">
                 {description}
               </p>
 
               {/* Buttons */}
+
               <div className="mt-8 flex gap-4">
 
                 <Link
@@ -143,9 +156,9 @@ export default function Hero() {
 
 
       {/* ==================== MOBILE BANNER ==================== */}
+
       <div className="md:hidden relative w-full min-h-[620px] overflow-hidden">
 
-        {/* Original Hero Image */}
         <Image
           src="/images/hero-banner-2.jpg"
           alt="Shazify Mobile Hero Banner"
@@ -156,9 +169,11 @@ export default function Hero() {
         />
 
         {/* Mobile Dark Overlay */}
+
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent"></div>
 
         {/* Mobile Content */}
+
         <div className="relative z-10 flex min-h-[620px] items-center">
 
           <div className="w-full px-5 sm:px-8">
@@ -166,25 +181,31 @@ export default function Hero() {
             <div className="max-w-[330px] text-white">
 
               {/* Mobile Collection Text */}
+
               <p className="uppercase tracking-[3px] text-pink-400 font-semibold text-xs sm:text-sm mb-3">
                 {smallTitle}
               </p>
 
               {/* Mobile Heading */}
+
               <h1 className="text-4xl sm:text-5xl font-extrabold leading-[1.05]">
+
                 {headingLine1}
 
                 <span className="block text-pink-500">
                   {headingLine2}
                 </span>
+
               </h1>
 
               {/* Mobile Description */}
+
               <p className="mt-5 text-sm sm:text-base text-gray-200 leading-relaxed max-w-xs">
                 {description}
               </p>
 
               {/* Mobile Buttons */}
+
               <div className="mt-7 flex gap-3">
 
                 <Link
