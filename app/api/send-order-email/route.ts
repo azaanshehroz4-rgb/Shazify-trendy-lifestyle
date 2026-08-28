@@ -121,11 +121,14 @@ export async function POST(req: Request) {
       data,
     });
 
-  } catch (error) {
-    console.error("Order email error:", error);
+   } catch (error: any) {
+    console.error("ORDER EMAIL API ERROR:", error);
 
     return NextResponse.json(
-      { error: "Email failed" },
+      {
+        error: error?.message || "Email failed",
+        name: error?.name || "UnknownError",
+      },
       { status: 500 }
     );
   }
