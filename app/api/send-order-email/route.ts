@@ -122,14 +122,14 @@ export async function POST(req: Request) {
     });
 
    } catch (error: any) {
-    console.error("ORDER EMAIL API ERROR:", error);
+  console.error("ORDER EMAIL API ERROR:", error);
 
-    return NextResponse.json(
-      {
-        error: error?.message || "Email failed",
-        name: error?.name || "UnknownError",
-      },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json(
+    {
+      error: error?.message || "Email failed",
+      name: error?.name || "UnknownError",
+    },
+    { status: 500 }
+  );
+}
 }
