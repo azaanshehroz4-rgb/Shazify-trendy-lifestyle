@@ -157,16 +157,16 @@ export default function Hero() {
 
       {/* ==================== MOBILE BANNER ==================== */}
 
-      <div className="md:hidden relative w-full min-h-[620px] overflow-hidden">
+      <div className="md:hidden relative w-full min-h-[600px] overflow-hidden">
 
-        <Image
-          src="/images/hero-banner-2.jpg"
-          alt="Shazify Mobile Hero Banner"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-[68%_center]"
-        />
+       <Image
+           src="/images/hero-banner-mobile.png"
+           alt="Shazify Mobile Hero Banner"
+           fill
+           priority
+           sizes="100vw"
+          className="object-cover object-center"
+       />
 
         {/* Mobile Dark Overlay */}
 
@@ -174,7 +174,7 @@ export default function Hero() {
 
         {/* Mobile Content */}
 
-        <div className="relative z-10 flex min-h-[620px] items-center">
+       <div className="relative z-10 flex min-h-[600px] items-center">
 
           <div className="w-full px-5 sm:px-8">
 
