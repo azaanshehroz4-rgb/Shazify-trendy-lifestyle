@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { resend } from "../../lib/resend";
-
 import { adminDb, adminAuth } from "../../lib/firebaseAdmin";
 export async function POST(req: Request) {
   console.log("EMAIL API HIT");
