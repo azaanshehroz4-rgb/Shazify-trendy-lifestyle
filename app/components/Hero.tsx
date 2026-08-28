@@ -77,6 +77,19 @@ export default function Hero() {
           className="object-cover"
         />
 
+        {/* Invisible clickable areas */}
+        <Link
+          href="/deals"
+          aria-label="Shop Now"
+          className="absolute left-[6%] top-[44%] w-[40%] h-[7%] z-10"
+        />
+
+        <Link
+          href="/categories"
+          aria-label="Explore"
+          className="absolute left-[6%] top-[52%] w-[40%] h-[7%] z-10"
+        />
+
       </div>
 
     </section>
