@@ -22,6 +22,7 @@ import LatestActivity from "../components/LatestActivity";
 import ExportButtons from "../components/ExportButtons";
 import AdminNotifications from "../components/AdminNotifications";
 import AdminActivity from "../components/AdminActivity";
+import HeroSettings from "../components/HeroSettings";
 
 export default function AdminPage() {
   
@@ -258,6 +259,7 @@ deliveredOrders={deliveredOrders}
 <LatestActivity orders={orders} />
 <ExportButtons orders={orders} />
 <QuickActions />
+<HeroSettings />
 
 
 
