@@ -1,7 +1,75 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../lib/firebase";
 
 export default function Hero() {
+  const [smallTitle, setSmallTitle] = useState("NEW COLLECTION 2026");
+  const [headingLine1, setHeadingLine1] = useState("Discover Your");
+  const [headingLine2, setHeadingLine2] = useState("Perfect Style");
+  const [description, setDescription] = useState(
+    "Shop premium fashion, beauty and lifestyle products."
+  );
+
+  const [shopNowText, setShopNowText] = useState("Shop Now");
+  const [shopNowLink, setShopNowLink] = useState("/deals");
+
+  const [exploreText, setExploreText] = useState("Explore");
+  const [exploreLink, setExploreLink] = useState("/categories");
+
+  useEffect(() => {
+    const loadHeroSettings = async () => {
+      try {
+        const heroRef = doc(db, "settings", "hero");
+        const heroSnap = await getDoc(heroRef);
+
+        if (heroSnap.exists()) {
+          const data = heroSnap.data();
+
+          setSmallTitle(
+            data.smallTitle || "NEW COLLECTION 2026"
+          );
+
+          setHeadingLine1(
+            data.headingLine1 || "Discover Your"
+          );
+
+          setHeadingLine2(
+            data.headingLine2 || "Perfect Style"
+          );
+
+          setDescription(
+            data.description ||
+              "Shop premium fashion, beauty and lifestyle products."
+          );
+
+          setShopNowText(
+            data.shopNowText || "Shop Now"
+          );
+
+          setShopNowLink(
+            data.shopNowLink || "/deals"
+          );
+
+          setExploreText(
+            data.exploreText || "Explore"
+          );
+
+          setExploreLink(
+            data.exploreLink || "/categories"
+          );
+        }
+      } catch (error) {
+        console.error("Error loading hero settings:", error);
+      }
+    };
+
+    loadHeroSettings();
+  }, []);
+
   return (
     <section className="relative w-full overflow-hidden">
 
@@ -27,35 +95,40 @@ export default function Hero() {
 
             <div className="max-w-xl text-white">
 
+              {/* Collection Text */}
               <p className="uppercase tracking-[4px] text-pink-400 font-semibold mb-3">
-                NEW COLLECTION 2026
+                {smallTitle}
               </p>
 
+              {/* Heading */}
               <h1 className="text-5xl md:text-7xl font-extrabold leading-tight">
-                Discover Your
+                {headingLine1}
+
                 <span className="block text-pink-500">
-                  Perfect Style
+                  {headingLine2}
                 </span>
               </h1>
 
+              {/* Description */}
               <p className="mt-6 text-lg text-gray-200">
-                Shop premium fashion, beauty and lifestyle products.
+                {description}
               </p>
 
+              {/* Buttons */}
               <div className="mt-8 flex gap-4">
 
                 <Link
-                  href="/deals"
+                  href={shopNowLink}
                   className="bg-pink-600 text-white px-8 py-3 rounded-lg hover:bg-pink-700 transition"
                 >
-                  Shop Now
+                  {shopNowText}
                 </Link>
 
                 <Link
-                  href="/categories"
+                  href={exploreLink}
                   className="border border-white px-8 py-3 rounded-lg hover:bg-white hover:text-black transition"
                 >
-                  Explore
+                  {exploreText}
                 </Link>
 
               </div>
@@ -85,7 +158,6 @@ export default function Hero() {
         {/* Mobile Dark Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent"></div>
 
-
         {/* Mobile Content */}
         <div className="relative z-10 flex min-h-[620px] items-center">
 
@@ -95,40 +167,38 @@ export default function Hero() {
 
               {/* Mobile Collection Text */}
               <p className="uppercase tracking-[3px] text-pink-400 font-semibold text-xs sm:text-sm mb-3">
-                NEW COLLECTION 2026
+                {smallTitle}
               </p>
-
 
               {/* Mobile Heading */}
               <h1 className="text-4xl sm:text-5xl font-extrabold leading-[1.05]">
-                Discover Your
+                {headingLine1}
+
                 <span className="block text-pink-500">
-                  Perfect Style
+                  {headingLine2}
                 </span>
               </h1>
 
-
               {/* Mobile Description */}
               <p className="mt-5 text-sm sm:text-base text-gray-200 leading-relaxed max-w-xs">
-                Shop premium fashion, beauty and lifestyle products.
+                {description}
               </p>
-
 
               {/* Mobile Buttons */}
               <div className="mt-7 flex gap-3">
 
                 <Link
-                  href="/deals"
+                  href={shopNowLink}
                   className="bg-pink-600 text-white px-5 sm:px-6 py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-pink-700 transition text-center shadow-lg"
                 >
-                  Shop Now
+                  {shopNowText}
                 </Link>
 
                 <Link
-                  href="/categories"
+                  href={exploreLink}
                   className="border-2 border-white text-white px-5 sm:px-6 py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-white hover:text-black transition text-center shadow-lg"
                 >
-                  Explore
+                  {exploreText}
                 </Link>
 
               </div>
