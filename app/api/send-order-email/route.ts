@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { resend } from "../../lib/resend";
-import { getAuth } from "firebase-admin/auth";
+
 import { adminDb, adminAuth } from "../../lib/firebaseAdmin";
 export async function POST(req: Request) {
   console.log("EMAIL API HIT");
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     const idToken = authorization.split("Bearer ")[1];
 
     // Verify Firebase user
-    const decodedToken = await getAuth().verifyIdToken(idToken);
+    const decodedToken = await adminAuth.verifyIdToken(idToken);
 
     const userId = decodedToken.uid;
 
