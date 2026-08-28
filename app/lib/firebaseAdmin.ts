@@ -1,17 +1,8 @@
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
 
 const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
-
-
-
-console.log("FIREBASE KEY CHECK:", {
-  exists: !!privateKey,
-  startsCorrectly: privateKey?.startsWith("-----BEGIN PRIVATE KEY-----"),
-  endsCorrectly: privateKey?.includes("-----END PRIVATE KEY-----"),
-  hasLiteralNewLines: privateKey?.includes("\\n"),
-  length: privateKey?.length,
-});
 
 const firebaseAdminApp =
   getApps().length === 0
@@ -19,9 +10,10 @@ const firebaseAdminApp =
         credential: cert({
           projectId: process.env.FIREBASE_PROJECT_ID,
           clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey, 
+          privateKey,
         }),
       })
     : getApps()[0];
 
 export const adminDb = getFirestore(firebaseAdminApp);
+export const adminAuth = getAuth(firebaseAdminApp);
