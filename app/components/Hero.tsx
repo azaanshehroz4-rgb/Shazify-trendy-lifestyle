@@ -17,11 +17,12 @@ export default function Hero() {
           className="object-cover object-right"
         />
 
-        {/* Dark overlay */}
+        {/* Desktop Dark Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/10"></div>
 
         {/* Desktop Content */}
         <div className="relative z-10 flex h-full items-center">
+
           <div className="w-full max-w-7xl mx-auto px-12">
 
             <div className="max-w-xl text-white">
@@ -60,35 +61,83 @@ export default function Hero() {
               </div>
 
             </div>
+
           </div>
+
         </div>
+
       </div>
 
 
       {/* ==================== MOBILE BANNER ==================== */}
-      <div className="md:hidden relative w-full aspect-[9/16] overflow-hidden">
+      <div className="md:hidden relative w-full min-h-[620px] overflow-hidden">
 
+        {/* Original Hero Image */}
         <Image
-          src="/images/hero-banner-mobile.png"
+          src="/images/hero-banner-2.jpg"
           alt="Shazify Mobile Hero Banner"
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          className="object-cover object-[68%_center]"
         />
 
-        {/* Invisible clickable areas */}
-        <Link
-          href="/deals"
-          aria-label="Shop Now"
-          className="absolute left-[6%] top-[44%] w-[40%] h-[7%] z-10"
-        />
+        {/* Mobile Dark Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent"></div>
 
-        <Link
-          href="/categories"
-          aria-label="Explore"
-          className="absolute left-[6%] top-[52%] w-[40%] h-[7%] z-10"
-        />
+
+        {/* Mobile Content */}
+        <div className="relative z-10 flex min-h-[620px] items-center">
+
+          <div className="w-full px-5 sm:px-8">
+
+            <div className="max-w-[330px] text-white">
+
+              {/* Mobile Collection Text */}
+              <p className="uppercase tracking-[3px] text-pink-400 font-semibold text-xs sm:text-sm mb-3">
+                NEW COLLECTION 2026
+              </p>
+
+
+              {/* Mobile Heading */}
+              <h1 className="text-4xl sm:text-5xl font-extrabold leading-[1.05]">
+                Discover Your
+                <span className="block text-pink-500">
+                  Perfect Style
+                </span>
+              </h1>
+
+
+              {/* Mobile Description */}
+              <p className="mt-5 text-sm sm:text-base text-gray-200 leading-relaxed max-w-xs">
+                Shop premium fashion, beauty and lifestyle products.
+              </p>
+
+
+              {/* Mobile Buttons */}
+              <div className="mt-7 flex gap-3">
+
+                <Link
+                  href="/deals"
+                  className="bg-pink-600 text-white px-5 sm:px-6 py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-pink-700 transition text-center shadow-lg"
+                >
+                  Shop Now
+                </Link>
+
+                <Link
+                  href="/categories"
+                  className="border-2 border-white text-white px-5 sm:px-6 py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-white hover:text-black transition text-center shadow-lg"
+                >
+                  Explore
+                </Link>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
 
       </div>
 
