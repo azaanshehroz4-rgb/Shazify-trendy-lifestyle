@@ -34,14 +34,9 @@ function LoginForm() {
       alert("Login Successful!");
 
       router.push(redirect);
-   } catch (error: any) {
-  console.error("LOGIN ERROR FULL:", error);
-
-  alert(
-    `Code: ${error?.code}\nMessage: ${error?.message}`
-  );
-} finally {
-
+    } catch (error: any) {
+      alert(error.message);
+    } finally {
       setLoading(false);
     }
   };
