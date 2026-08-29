@@ -4,12 +4,13 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDrYI21ndk-o3ArCoPdVS67aoRUweb41Y",
+  apiKey: "AIzaSyDrYI21ndk-o3ArCoPdVS67aoRUweb41bY",
   authDomain: "shazify-14122.firebaseapp.com",
   projectId: "shazify-14122",
   storageBucket: "shazify-14122.firebasestorage.app",
   messagingSenderId: "577432175768",
   appId: "1:577432175768:web:4bb6f59525d42bbd483ced",
+  measurementId: "G-S46Z0L9Z0M"
 };
 
 const app = getApps().length > 0
