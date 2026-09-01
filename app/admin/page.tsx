@@ -25,6 +25,7 @@ import LatestActivity from "../components/LatestActivity";
 import ExportButtons from "../components/ExportButtons";
 import AdminNotifications from "../components/AdminNotifications";
 import AdminActivity from "../components/AdminActivity";
+import AdminNotificationToggle from "../components/AdminNotificationToggle";
 import HeroSettings from "../components/HeroSettings";
 import { requestNotificationPermission } from "../lib/firebase-messaging";
 
@@ -280,6 +281,7 @@ deliveredOrders={deliveredOrders}
   pendingOrders={pendingOrders}
   lowStockProducts={lowStockProducts}
 />
+<AdminNotificationToggle />
 
 
 <div className="mt-8">
