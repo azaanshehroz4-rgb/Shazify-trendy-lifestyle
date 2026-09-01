@@ -48,6 +48,35 @@ useEffect(() => {
     router.push("/");
   }
 }, [user, loading, router]);
+useEffect(() => {
+  if (loading) return;
+  if (!user) return;
+  if (user.email !== ADMIN_EMAIL) return;
+
+  const setupNotifications = async () => {
+    try {
+      const token = await requestNotificationPermission();
+
+      await setDoc(
+        doc(db, "adminNotificationTokens", token),
+        {
+          token,
+          adminEmail: user.email,
+          userId: user.uid,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      console.log("Admin notification token saved successfully.");
+    } catch (error) {
+      console.error("Notification setup failed:", error);
+    }
+  };
+
+  setupNotifications();
+}, [loading, user]);
     const [orders, setOrders] = useState<any[]>([]);
 const [ordersLoading, setOrdersLoading] = useState(true);
 const [pendingOrders, setPendingOrders] = useState(0);
