@@ -58,18 +58,22 @@ useEffect(() => {
     try {
       const token = await requestNotificationPermission();
 
-      await setDoc(
-        doc(db, "adminNotificationTokens", token),
-        {
-          token,
-          adminEmail: user.email,
-          userId: user.uid,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
+     if (!token) {
+  console.error("No notification token available.");
+  return;
+}
 
+await setDoc(
+  doc(db, "adminNotificationTokens", token),
+  {
+    token,
+    adminEmail: user.email,
+    userId: user.uid,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  },
+  { merge: true }
+);
       console.log("Admin notification token saved successfully.");
     } catch (error) {
       console.error("Notification setup failed:", error);
