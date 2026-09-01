@@ -21,6 +21,7 @@ export default function AddProductPage() {
   // Prices are entered in PKR
   const [price, setPrice] = useState("");
   const [oldPrice, setOldPrice] = useState("");
+  const [weight, setWeight] = useState("");
 
   const [rating, setRating] = useState("");
   const [description, setDescription] = useState("");
@@ -127,6 +128,11 @@ export default function AddProductPage() {
     if (!stock || Number(stock) < 0) {
       alert("Please enter valid stock quantity.");
       return;
+     
+    }
+    if (!weight || Number(weight) <= 0) {
+      alert("Please enter a valid product weight in kg.");
+    return;
     }
 
     // Remove empty image slots
@@ -166,6 +172,8 @@ export default function AddProductPage() {
         price: Number(price),
         oldPrice: Number(oldPrice),
         currency: "PKR",
+
+        weight: Number(weight),
 
         rating: Number(rating),
         stock: Number(stock),
@@ -326,6 +334,27 @@ export default function AddProductPage() {
 
   <p className="text-sm text-gray-500 mt-1">
     Enter original/old price in Pakistani Rupees.
+  </p>
+</div>
+{/* Product Weight */}
+
+<div>
+  <label className="block font-semibold mb-2">
+    Product Weight (kg)
+  </label>
+
+  <input
+    type="number"
+    placeholder="Example: 0.5"
+    value={weight}
+    onChange={(e) => setWeight(e.target.value)}
+    min="0.01"
+    step="0.01"
+    className="w-full border p-3 rounded-lg"
+  />
+
+  <p className="text-sm text-gray-500 mt-1">
+    Enter product weight in kilograms. Example: 0.5 kg
   </p>
 </div>
             {/* Rating */}

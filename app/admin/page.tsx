@@ -7,6 +7,9 @@ import {
   collection,
   getDocs,
   onSnapshot,
+  doc,
+  setDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
@@ -23,6 +26,7 @@ import ExportButtons from "../components/ExportButtons";
 import AdminNotifications from "../components/AdminNotifications";
 import AdminActivity from "../components/AdminActivity";
 import HeroSettings from "../components/HeroSettings";
+import { requestNotificationPermission } from "../lib/firebase-messaging";
 
 export default function AdminPage() {
   
