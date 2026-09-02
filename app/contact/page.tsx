@@ -75,7 +75,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             </p>
 
             <p className="mb-4">
-              📞 Phone: +92 300 1234567
+              📞 Phone: +92 3394454531
             </p>
 
             <p>

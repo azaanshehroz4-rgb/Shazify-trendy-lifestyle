@@ -72,7 +72,7 @@ export async function POST(req: Request) {
     }
 
     const data = await resend.emails.send({
-      from: "Shazify <onboarding@resend.dev>",
+      from: "Shazify <orders@shazify.shop>",
       to: email,
       subject: `Order Confirmation - ${order.orderId}`,
       html: `

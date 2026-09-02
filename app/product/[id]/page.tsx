@@ -1,5 +1,5 @@
 import { db } from "../../lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import ProductDetails from "./ProductDetailsClient";
 import type { Metadata } from "next";
 
@@ -97,6 +97,22 @@ export default async function ProductPage({
     return <div>Product not found.</div>;
   }
 
+  const reviewSnapshot = await getDocs(collection(db, "reviews"));
+
+const productReviews = reviewSnapshot.docs
+  .map((reviewDoc) => reviewDoc.data())
+  .filter((review: any) => review.productId === id);
+
+const totalReviews = productReviews.length;
+
+const averageRating =
+  totalReviews > 0
+    ? productReviews.reduce(
+        (sum: number, review: any) => sum + Number(review.rating || 0),
+        0
+      ) / totalReviews
+    : 0;
+
  const data = docSnap.data();
 
 const product: any = {
@@ -136,6 +152,17 @@ const product: any = {
     },
 
     sku: product.id,
+
+    aggregateRating:
+  totalReviews > 0
+    ? {
+        "@type": "AggregateRating",
+        ratingValue: Number(averageRating.toFixed(1)),
+        reviewCount: totalReviews,
+        bestRating: 5,
+        worstRating: 1,
+      }
+    : undefined,
 
     offers: {
       "@type": "Offer",
