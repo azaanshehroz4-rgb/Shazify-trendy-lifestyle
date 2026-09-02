@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { doc, deleteDoc } from "firebase/firestore";
+import { db } from "../lib/firebase";
 import { requestNotificationPermission } from "../lib/firebase-messaging";
 
 export default function AdminNotificationToggle() {
@@ -10,9 +12,9 @@ export default function AdminNotificationToggle() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    if ("Notification" in window) {
-      setEnabled(Notification.permission === "granted");
-    }
+    const saved = localStorage.getItem("shazify_admin_notifications");
+
+    setEnabled(saved === "true");
   }, []);
 
   const handleToggle = async () => {
@@ -21,23 +23,64 @@ export default function AdminNotificationToggle() {
     setLoading(true);
 
     try {
+      // =========================
+      // TURN OFF
+      // =========================
       if (enabled) {
-        alert(
-          "Notifications ko OFF karne ke liye browser/site notification permission ko Block karna hoga."
+        const token = localStorage.getItem(
+          "shazify_admin_notification_token"
         );
-        setLoading(false);
+
+        if (token) {
+          await deleteDoc(
+            doc(db, "adminNotificationTokens", token)
+          );
+
+          localStorage.removeItem(
+            "shazify_admin_notification_token"
+          );
+        }
+
+        localStorage.setItem(
+          "shazify_admin_notifications",
+          "false"
+        );
+
+        setEnabled(false);
+
+        alert("🔕 Notifications turned OFF.");
         return;
       }
 
+      // =========================
+      // TURN ON
+      // =========================
       const token = await requestNotificationPermission();
 
-      if (token) {
-        setEnabled(true);
-        alert("🔔 Notifications enabled successfully!");
+      if (!token) {
+        alert(
+          "Notification permission nahi mili. Browser mein Allow karna zaroori hai."
+        );
+        return;
       }
+
+      localStorage.setItem(
+        "shazify_admin_notification_token",
+        token
+      );
+
+      localStorage.setItem(
+        "shazify_admin_notifications",
+        "true"
+      );
+
+      setEnabled(true);
+
+      alert("🔔 Notifications enabled successfully!");
     } catch (error) {
       console.error("Notification toggle error:", error);
-      alert("Notification permission nahi mil saki.");
+
+      alert("Notification setting change nahi ho saki.");
     } finally {
       setLoading(false);
     }
@@ -48,7 +91,9 @@ export default function AdminNotificationToggle() {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold">
-            {enabled ? "🔔 Order Notifications" : "🔕 Order Notifications"}
+            {enabled
+              ? "🔔 Order Notifications"
+              : "🔕 Order Notifications"}
           </h2>
 
           <p className="text-sm text-gray-500 mt-1">
