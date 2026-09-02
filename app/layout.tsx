@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.shazify.com"),
+  metadataBase: new URL("https://shazify.shop"),
 
   title: {
     default: "Shazify Trendy Lifestyle",

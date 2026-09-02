@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "./lib/firebase";
 
-const SITE_URL = "https://www.shazify.com";
+const SITE_URL = "https://www.shazify.shop";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [

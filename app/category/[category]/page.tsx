@@ -5,7 +5,7 @@ import { collection, getDocs } from "firebase/firestore";
 import type { Metadata } from "next";
 import { formatPrice } from "../../lib/currency";
 
-const SITE_URL = "https://www.shazify.com";
+const SITE_URL = "https://www.shazify.shop";
 export async function generateMetadata({
   params,
 }: {
@@ -46,7 +46,7 @@ const title = `${categoryName} Products`;
 
  images: [
   {
-    url: "https://www.shazify.com/images/shazify-og.jpg",
+    url: "https://www.shazify.shop/images/shazify-og.jpg",
     width: 1200,
     height: 630,
     alt: `${categoryName} Products | Shazify`,
@@ -58,7 +58,7 @@ const title = `${categoryName} Products`;
   card: "summary_large_image",
   title,
   description,
-  images: ["https://www.shazify.com/images/shazify-og.jpg"],
+  images: ["https://www.shazify.shop/images/shazify-og.jpg"],
 },
   };
 }
