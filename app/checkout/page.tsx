@@ -70,7 +70,42 @@ const handlePlaceOrder = async () => {
 
       createdAt: serverTimestamp(),
     });
+    // 🔔 Notify admin about the new order
+    try {
+      const notificationResponse = await fetch(
+        "/api/send-order-notification",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({
+            orderId,
+          }),
+        }
+      );
 
+      const notificationData =
+        await notificationResponse.json();
+
+      if (!notificationResponse.ok) {
+        console.error(
+          "Notification API failed:",
+          notificationData
+        );
+      } else {
+        console.log(
+          "Admin notification sent:",
+          notificationData
+        );
+      }
+    } catch (notificationError) {
+      console.error(
+        "Admin notification error:",
+        notificationError
+      );
+    }
     const emailResponse = await fetch("/api/send-order-email", {
       method: "POST",
 
