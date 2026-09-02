@@ -1,4 +1,5 @@
 import { getMessaging, isSupported, getToken } from "firebase/messaging";
+
 import app from "./firebase";
 
 const VAPID_KEY =
@@ -23,24 +24,37 @@ export async function requestNotificationPermission() {
     throw new Error("This browser does not support notifications.");
   }
 
+  // Ask for browser notification permission
+  const permission = await Notification.requestPermission();
+
+  if (permission !== "granted") {
+    throw new Error(
+      `Notification permission was not granted. Current permission: ${permission}`
+    );
+  }
+
+  // Register Firebase Messaging service worker
+  const serviceWorkerRegistration =
+    await navigator.serviceWorker.register(
+      "/firebase-messaging-sw.js"
+    );
+
   const messaging = await getFirebaseMessaging();
 
   if (!messaging) {
     throw new Error("Firebase Messaging is not supported.");
   }
 
-  const permission = await Notification.requestPermission();
-
-  if (permission !== "granted") {
-    throw new Error("Notification permission was not granted.");
-  }
-
+  // Generate FCM token
   const token = await getToken(messaging, {
     vapidKey: VAPID_KEY,
+    serviceWorkerRegistration,
   });
 
   if (!token) {
-    throw new Error("Firebase notification token could not be created.");
+    throw new Error(
+      "Firebase notification token could not be created."
+    );
   }
 
   return token;
