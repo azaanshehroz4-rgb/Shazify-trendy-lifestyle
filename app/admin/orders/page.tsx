@@ -10,6 +10,7 @@ import {
   query,
   orderBy,
   updateDoc,
+   deleteDoc,
   doc,
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
@@ -91,6 +92,32 @@ const updateOrderStatus = async (
     console.error(error);
   }
 };
+
+const deleteOrder = async (orderId: string) => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to permanently delete this delivered order?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    await deleteDoc(doc(db, "orders", orderId));
+
+    await logActivity(
+      `Order ${orderId.slice(0, 8)} deleted`
+    );
+
+    setOrders((prev) =>
+      prev.filter((order) => order.id !== orderId)
+    );
+
+    alert("Order deleted successfully!");
+  } catch (error) {
+    console.error("Delete order error:", error);
+    alert("Failed to delete order.");
+  }
+};
+
   return (
     <>
       <Navbar />
@@ -180,13 +207,25 @@ const updateOrderStatus = async (
     <option value="Delivered">Delivered</option>
   </select>
 </td>
-            <td className="p-4">
-  <Link
-    href={`/admin/orders/${order.id}`}
-    className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700"
-  >
-    View
-  </Link>
+
+<td className="p-4">
+  <div className="flex gap-2">
+    <Link
+      href={`/admin/orders/${order.id}`}
+      className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700"
+    >
+      View
+    </Link>
+
+    {order.status === "Delivered" && (
+      <button
+        onClick={() => deleteOrder(order.id)}
+        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+      >
+        Delete
+      </button>
+    )}
+  </div>
 </td>
 
           </tr>
