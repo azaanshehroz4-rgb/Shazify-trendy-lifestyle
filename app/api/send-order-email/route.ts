@@ -71,10 +71,11 @@ export async function POST(req: Request) {
       );
     }
 
-    const data = await resend.emails.send({
-      from: "Shazify <orders@shazify.shop>",
-      to: email,
-      subject: `Order Confirmation - ${order.orderId}`,
+         const data = await resend.emails.send({
+          from: "Shazify <orders@shazify.shop>",
+          to: email,
+          replyTo: "shazifyofficial@gmail.com",
+          subject: `Order Confirmation - ${order.orderId}`,
       html: `
         <div style="font-family:Arial,sans-serif;padding:30px;">
           <h1 style="color:#e91e63;">
