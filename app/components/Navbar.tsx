@@ -1,13 +1,14 @@
 "use client";
 
 import { Heart, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useWishlist } from "../context/WishlistContext";
 import { useSearch } from "../context/SearchContext";
 import Link from "next/link";
 import { useCart } from "../hooks/useCart";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
+import { getUserCurrency, type Currency } from "../lib/currency";
 
 export default function Navbar() {
   const { totalItems } = useCart();
@@ -17,6 +18,37 @@ export default function Navbar() {
   const router = useRouter();
 
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const [currency, setCurrency] = useState<Currency>("PKR");
+
+useEffect(() => {
+  const savedCurrency = localStorage.getItem(
+    "shazify_currency"
+  ) as Currency | null;
+
+  if (savedCurrency) {
+    setCurrency(savedCurrency);
+  } else {
+    setCurrency(getUserCurrency());
+  }
+}, []);
+
+const handleCurrencyChange = (
+  newCurrency: Currency
+) => {
+  localStorage.setItem(
+    "shazify_currency",
+    newCurrency
+  );
+
+  setCurrency(newCurrency);
+
+  window.dispatchEvent(
+    new CustomEvent("shazify-currency-change", {
+      detail: newCurrency,
+    })
+  );
+};
 
   const closeMenu = () => {
     setMenuOpen(false);
@@ -56,6 +88,22 @@ export default function Navbar() {
                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-pink-500"
               />
             </div>
+
+            {/* Currency Selector */}
+<div className="hidden md:block shrink-0">
+  <select
+    value={currency}
+    onChange={(e) =>
+      handleCurrencyChange(e.target.value as Currency)
+    }
+    className="border border-pink-600 text-pink-600 rounded-lg px-3 py-2.5 font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+  >
+    <option value="PKR">🇵🇰 PKR</option>
+    <option value="USD">🇺🇸 USD</option>
+    <option value="EUR">🇪🇺 EUR</option>
+    <option value="GBP">🇬🇧 GBP</option>
+  </select>
+</div>
 
             {/* Desktop Cart + Wishlist */}
             <div className="hidden md:flex items-center gap-3 shrink-0">
