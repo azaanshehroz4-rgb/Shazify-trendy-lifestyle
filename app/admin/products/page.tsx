@@ -29,7 +29,7 @@ const [sortOption, setSortOption] = useState("Default");
 const [currentPage, setCurrentPage] = useState(1);
 const productsPerPage = 10;
 
-const ADMIN_EMAIL = "azaanshehroz4@gmail.com";
+const ADMIN_EMAIL = "shazifyofficial@gmail.com";
 
 useEffect(() => {
   if (loading) return;

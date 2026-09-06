@@ -28,7 +28,7 @@ export default function AdminOrdersPage() {
 const router = useRouter();
     const [orders, setOrders] = useState<any[]>([]);
 const [ordersLoading, setOrdersLoading] = useState(true);
-const ADMIN_EMAIL = "azaanshehroz4@gmail.com";
+const ADMIN_EMAIL = "shazifyofficial@gmail.com";
 
 useEffect(() => {
   if (authLoading) return;

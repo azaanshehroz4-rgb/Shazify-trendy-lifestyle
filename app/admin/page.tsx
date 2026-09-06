@@ -33,7 +33,7 @@ export default function AdminPage() {
   
     const { user, loading } = useAuth();
 const router = useRouter();
-const ADMIN_EMAIL = "azaanshehroz4@gmail.com";
+const ADMIN_EMAIL = "shazifyofficial@gmail.com";
 console.log("Logged in user:", user);
 console.log("Logged in email:", user?.email);
 console.log("Admin email:", ADMIN_EMAIL);

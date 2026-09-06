@@ -19,7 +19,7 @@ const router = useRouter();
 
 const [order, setOrder] = useState<any>(null);
 const [loading, setLoading] = useState(true);
-const ADMIN_EMAIL = "azaanshehroz4@gmail.com";
+const ADMIN_EMAIL = "shazifyofficial@gmail.com";
 const [trackingNumber, setTrackingNumber] = useState("");
 const [courier, setCourier] = useState("");
 

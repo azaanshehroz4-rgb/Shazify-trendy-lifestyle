@@ -20,7 +20,7 @@ const router = useRouter();
   const [reviews, setReviews] = useState<any[]>([]);
   
   const [reviewsLoading, setReviewsLoading] = useState(true);
-  const ADMIN_EMAIL = "azaanshehroz4@gmail.com";
+  const ADMIN_EMAIL = "shazifyofficial@gmail.com";
 useEffect(() => {
   if (loading) return;
 

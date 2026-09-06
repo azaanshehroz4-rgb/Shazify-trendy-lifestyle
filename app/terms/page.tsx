@@ -167,7 +167,7 @@ export default function TermsPage() {
             </p>
 
             <p className="text-pink-600 font-semibold mt-2">
-              azaanshehroz4@gmail.com
+              shazifyofficial@gmail.com
             </p>
           </section>
 

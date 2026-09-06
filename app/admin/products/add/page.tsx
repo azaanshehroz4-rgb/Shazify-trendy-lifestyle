@@ -47,7 +47,7 @@ export default function AddProductPage() {
   const [uploading, setUploading] = useState(false);
   const submittingRef = useRef(false);
 
-  const ADMIN_EMAIL = "azaanshehroz4@gmail.com";
+  const ADMIN_EMAIL = "shazifyofficial@gmail.com";
 
   // --------------------------------
   // Authentication

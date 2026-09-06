@@ -71,7 +71,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             </h2>
 
             <p className="mb-4">
-              📧  Email: azaanshehroz4@gmail.com
+              📧  Email: shazifyofficial@gmail.com
             </p>
 
             <p className="mb-4">

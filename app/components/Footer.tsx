@@ -228,10 +228,10 @@ export default function Footer() {
           </p>
 
           <a
-             href="mailto: azaanshehroz4@gmail.com"
+             href="mailto: shazifyofficial@gmail.com"
             className="text-pink-500 hover:text-pink-400 transition"
           >
-            azaanshehroz4@gmail.com
+            shazifyofficial@gmail.com
           </a>
 
           <p className="text-gray-400 mt-4">

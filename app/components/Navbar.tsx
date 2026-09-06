@@ -149,7 +149,7 @@ export default function Navbar() {
                 My Account
               </Link>
 
-              {user.email === "azaanshehroz4@gmail.com" && (
+              {user.email === "shazifyofficial@gmail.com" && (
                 <Link
                   href="/admin"
                   className="hover:text-yellow-300 transition"
@@ -239,7 +239,7 @@ export default function Navbar() {
                   My Account
                 </Link>
 
-                {user.email === "azaanshehroz4@gmail.com" && (
+                {user.email === "shazifyofficial@gmail.com" && (
                   <Link
                     href="/admin"
                     onClick={closeMenu}

@@ -23,7 +23,7 @@ const [questions, setQuestions] = useState<any[]>([]);
 const [questionsLoading, setQuestionsLoading] = useState(true);
 const [answers, setAnswers] = useState<{ [key: string]: string }>({});
 
-const ADMIN_EMAIL = "azaanshehroz4@gmail.com";
+const ADMIN_EMAIL = "shazifyofficial@gmail.com";
 const fetchQuestions = async () => {
   try {
     const snapshot = await getDocs(collection(db, "questions"));
