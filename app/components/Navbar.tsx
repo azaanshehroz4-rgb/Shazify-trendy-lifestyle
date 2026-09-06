@@ -1,14 +1,15 @@
 "use client";
 
 import { Heart, Menu, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useWishlist } from "../context/WishlistContext";
 import { useSearch } from "../context/SearchContext";
 import Link from "next/link";
 import { useCart } from "../hooks/useCart";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
-import { getUserCurrency, type Currency } from "../lib/currency";
+import { useCurrency } from "../context/CurrencyContext";
+import type { Currency } from "../lib/currency";
 
 export default function Navbar() {
   const { totalItems } = useCart();
@@ -17,41 +18,18 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const router = useRouter();
 
+  const { currency, setCurrency } = useCurrency();
+
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const [currency, setCurrency] = useState<Currency>("PKR");
-
-useEffect(() => {
-  const savedCurrency = localStorage.getItem(
-    "shazify_currency"
-  ) as Currency | null;
-
-  if (savedCurrency) {
-    setCurrency(savedCurrency);
-  } else {
-    setCurrency(getUserCurrency());
-  }
-}, []);
-
-const handleCurrencyChange = (
-  newCurrency: Currency
-) => {
-  localStorage.setItem(
-    "shazify_currency",
-    newCurrency
-  );
-
-  setCurrency(newCurrency);
-
-  window.dispatchEvent(
-    new CustomEvent("shazify-currency-change", {
-      detail: newCurrency,
-    })
-  );
-};
 
   const closeMenu = () => {
     setMenuOpen(false);
+  };
+
+  const handleCurrencyChange = (
+    newCurrency: Currency
+  ) => {
+    setCurrency(newCurrency);
   };
 
   const handleLogout = async () => {
@@ -90,20 +68,22 @@ const handleCurrencyChange = (
             </div>
 
             {/* Currency Selector */}
-<div className="hidden md:block shrink-0">
-  <select
-    value={currency}
-    onChange={(e) =>
-      handleCurrencyChange(e.target.value as Currency)
-    }
-    className="border border-pink-600 text-pink-600 rounded-lg px-3 py-2.5 font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-pink-500"
-  >
-    <option value="PKR">🇵🇰 PKR</option>
-    <option value="USD">🇺🇸 USD</option>
-    <option value="EUR">🇪🇺 EUR</option>
-    <option value="GBP">🇬🇧 GBP</option>
-  </select>
-</div>
+            <div className="hidden md:block shrink-0">
+              <select
+                value={currency}
+                onChange={(e) =>
+                  handleCurrencyChange(
+                    e.target.value as Currency
+                  )
+                }
+                className="border border-pink-600 text-pink-600 rounded-lg px-3 py-2.5 font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+              >
+                <option value="PKR">🇵🇰 PKR</option>
+                <option value="USD">🇺🇸 USD</option>
+                <option value="EUR">🇪🇺 EUR</option>
+                <option value="GBP">🇬🇧 GBP</option>
+              </select>
+            </div>
 
             {/* Desktop Cart + Wishlist */}
             <div className="hidden md:flex items-center gap-3 shrink-0">
@@ -156,7 +136,10 @@ const handleCurrencyChange = (
         {/* Desktop Navigation */}
         <div className="hidden md:flex max-w-7xl mx-auto items-center gap-8 px-6 py-4 font-semibold">
 
-          <Link href="/" className="hover:text-yellow-300 transition">
+          <Link
+            href="/"
+            className="hover:text-yellow-300 transition"
+          >
             Home
           </Link>
 
@@ -276,6 +259,24 @@ const handleCurrencyChange = (
             >
               Contact
             </Link>
+
+            {/* Mobile Currency Selector */}
+            <div className="pt-3">
+              <select
+                value={currency}
+                onChange={(e) =>
+                  handleCurrencyChange(
+                    e.target.value as Currency
+                  )
+                }
+                className="w-full border border-white rounded-lg px-3 py-2.5 bg-white text-pink-600 font-semibold focus:outline-none"
+              >
+                <option value="PKR">🇵🇰 PKR</option>
+                <option value="USD">🇺🇸 USD</option>
+                <option value="EUR">🇪🇺 EUR</option>
+                <option value="GBP">🇬🇧 GBP</option>
+              </select>
+            </div>
 
             {user ? (
               <>

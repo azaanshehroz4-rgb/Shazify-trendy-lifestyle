@@ -9,6 +9,20 @@ export function getUserCurrency(): Currency {
     return "PKR";
   }
 
+  // Manual currency preference
+  const savedCurrency = localStorage.getItem(
+    "shazify_currency"
+  ) as Currency | null;
+
+  if (
+    savedCurrency === "PKR" ||
+    savedCurrency === "USD" ||
+    savedCurrency === "EUR" ||
+    savedCurrency === "GBP"
+  ) {
+    return savedCurrency;
+  }
+
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   // Pakistan
@@ -55,9 +69,6 @@ export function convertPrice(
   pricePKR: number,
   currency: Currency
 ): number {
-  // These are initial display rates.
-  // We can connect a live exchange-rate API later.
-
   const exchangeRates: Record<Currency, number> = {
     PKR: 1,
     USD: 1 / 280,
