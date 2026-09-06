@@ -10,6 +10,7 @@ import { useSearch } from "../context/SearchContext";
 import { useWishlist } from "../context/WishlistContext";
 import Link from "next/link";
 import { formatPrice } from "../lib/currency";
+import { useCurrency } from "../context/CurrencyContext";
 
 export default function FeaturedProducts() {
   const [products, setProducts] = useState<any[]>([]);
@@ -23,6 +24,7 @@ export default function FeaturedProducts() {
   } = useWishlist();
 
   const { search } = useSearch();
+  const { currency } = useCurrency();
 
   const handleAddToCart = (product: any) => {
     console.log("Clicked:", product);
@@ -271,11 +273,11 @@ export default function FeaturedProducts() {
                 <div className="flex flex-wrap items-center gap-1 sm:gap-3 mt-2 sm:mt-4">
 
                   <span className="text-pink-600 text-sm sm:text-xl lg:text-2xl font-bold">
-                    {formatPrice(product.price)}
+                    {formatPrice(product.price, currency)}
                   </span>
 
                   <span className="line-through text-gray-400 text-[10px] sm:text-sm">
-                    {formatPrice(product.oldPrice)}
+                    {formatPrice(product.oldPrice, currency)}
                   </span>
 
                 </div>
