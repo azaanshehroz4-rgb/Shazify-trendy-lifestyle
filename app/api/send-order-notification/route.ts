@@ -10,7 +10,8 @@ export async function POST(req: Request) {
   try {
     const authorization = req.headers.get("authorization");
     const body = await req.json();
-    const { orderId } = body;
+
+    const { orderId, email } = body;
 
     if (!orderId) {
       return NextResponse.json(
@@ -36,9 +37,34 @@ export async function POST(req: Request) {
     const orderDoc = orderSnapshot.docs[0];
     const order = orderDoc.data();
 
-    // Guest order
-    if (order.isGuestOrder === true || order.checkoutType === "guest") {
-      console.log("Guest order notification:", orderId);
+    // Guest order requires matching email
+    if (
+      order.isGuestOrder === true ||
+      order.checkoutType === "guest"
+    ) {
+      if (!email) {
+        return NextResponse.json(
+          { error: "Email is required for guest orders." },
+          { status: 401 }
+        );
+      }
+
+      const orderEmail = String(order.email || "")
+        .trim()
+        .toLowerCase();
+
+      const providedEmail = String(email)
+        .trim()
+        .toLowerCase();
+
+      if (!orderEmail || orderEmail !== providedEmail) {
+        return NextResponse.json(
+          { error: "You are not allowed to access this order." },
+          { status: 403 }
+        );
+      }
+
+      console.log("Guest order notification authorized:", orderId);
     } else {
       // Logged-in order requires Firebase ID token
       if (!authorization?.startsWith("Bearer ")) {
@@ -116,7 +142,6 @@ export async function POST(req: Request) {
       sent: response.successCount,
       failed: response.failureCount,
     });
-
   } catch (error: any) {
     console.error("ORDER NOTIFICATION API ERROR:", error);
 

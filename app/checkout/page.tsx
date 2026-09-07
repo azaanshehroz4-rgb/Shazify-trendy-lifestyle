@@ -168,9 +168,10 @@ export default function CheckoutPage() {
           {
             method: "POST",
             headers: emailHeaders,
-            body: JSON.stringify({
-              orderId,
-            }),
+           body: JSON.stringify({
+             orderId,
+              email: email.trim(),
+         }),
           }
         );
 

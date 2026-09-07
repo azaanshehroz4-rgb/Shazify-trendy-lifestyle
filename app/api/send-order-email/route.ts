@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   try {
     const authorization = req.headers.get("authorization");
     const body = await req.json();
-    const { orderId } = body;
+    const { orderId, email } = body;
 
     if (!orderId) {
       return NextResponse.json(
@@ -36,42 +36,68 @@ export async function POST(req: Request) {
     const orderDoc = orderSnapshot.docs[0];
     const order = orderDoc.data();
 
-    /*
-     * Guest order:
-     * No Firebase authentication is required.
-     */
-    const isGuestOrder =
-      order.isGuestOrder === true ||
-      order.checkoutType === "guest";
+   
 
-    /*
-     * Account order:
-     * Firebase ID token is required and ownership is verified.
-     */
-    if (!isGuestOrder) {
-      if (!authorization?.startsWith("Bearer ")) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 401 }
-        );
-      }
+     /*
+ * Guest order:
+ * Order ID + matching email are required.
+ */
+const isGuestOrder =
+  order.isGuestOrder === true ||
+  order.checkoutType === "guest";
 
-      const idToken = authorization.split("Bearer ")[1];
+if (isGuestOrder) {
+  if (!email) {
+    return NextResponse.json(
+      { error: "Email is required for guest orders." },
+      { status: 401 }
+    );
+  }
 
-      const decodedToken = await adminAuth.verifyIdToken(idToken);
+  const orderEmail = String(order.email || "")
+    .trim()
+    .toLowerCase();
 
-      const userId = decodedToken.uid;
+  const providedEmail = String(email)
+    .trim()
+    .toLowerCase();
 
-      if (order.userId !== userId) {
-        return NextResponse.json(
-          { error: "You are not allowed to access this order." },
-          { status: 403 }
-        );
-      }
-    }
+  if (!orderEmail || orderEmail !== providedEmail) {
+    return NextResponse.json(
+      { error: "You are not allowed to access this order." },
+      { status: 403 }
+    );
+  }
+
+  console.log("Guest order email authorized:", orderId);
+} else {
+  /*
+   * Account order:
+   * Firebase ID token is required and ownership is verified.
+   */
+  if (!authorization?.startsWith("Bearer ")) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  const idToken = authorization.split("Bearer ")[1];
+
+  const decodedToken = await adminAuth.verifyIdToken(idToken);
+
+  const userId = decodedToken.uid;
+
+  if (order.userId !== userId) {
+    return NextResponse.json(
+      { error: "You are not allowed to access this order." },
+      { status: 403 }
+    );
+  }
+}
 
     // Use Firestore data, NOT browser-supplied data
-    const email = order.email;
+    const orderEmail = order.email;
     const fullName = order.fullName || "Customer";
     const totalPrice = order.totalPrice;
     const currency = order.currency || "PKR";
@@ -108,7 +134,7 @@ export async function POST(req: Request) {
 
     const data = await resend.emails.send({
       from: "Shazify <orders@shazify.shop>",
-      to: email,
+      to: orderEmail,
       replyTo: "shazifyofficial@gmail.com",
       subject: `Order Confirmation - ${order.orderId}`,
 
