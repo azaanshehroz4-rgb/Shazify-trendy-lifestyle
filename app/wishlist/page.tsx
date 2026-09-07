@@ -4,13 +4,14 @@ import Image from "next/image";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../hooks/useCart";
 import { formatPrice } from "../lib/currency";
+import { useCurrency } from "../context/CurrencyContext";
 export default function WishlistPage() {
   const {
     wishlist,
     removeFromWishlist,
   } = useWishlist();
-
   const { addToCart } = useCart();
+  const { currency } = useCurrency();
 
   return (
     <div className="max-w-7xl mx-auto p-10">
@@ -52,7 +53,7 @@ export default function WishlistPage() {
                   <p>{item.category}</p>
 
                 <p className="text-pink-600 font-bold">
-                {formatPrice(item.price)}
+                {formatPrice(item.price, currency)}
                </p>
                 </div>
               </div>

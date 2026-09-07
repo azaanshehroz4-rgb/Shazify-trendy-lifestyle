@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCart } from "../hooks/useCart";
 import Link from "next/link";
 import { formatPrice } from "../lib/currency";
+import { useCurrency } from "../context/CurrencyContext";
 export default function CartPage() {
   const {
     cart,
@@ -14,6 +15,7 @@ export default function CartPage() {
     totalPrice,
     clearCart,
   } = useCart();
+  const { currency } = useCurrency();
 
   return (
     <>
@@ -58,7 +60,7 @@ export default function CartPage() {
 
                   <p>{item.category}</p>
 
-                <p>Price: {formatPrice(item.price)}</p>
+                <p>Price: {formatPrice(item.price, currency)}</p>
 
                   <div className="flex items-center gap-3 mt-3">
                     <button
@@ -88,7 +90,7 @@ export default function CartPage() {
               </div>
 
              <div className="font-bold">
-                {formatPrice(item.price * item.quantity)}
+              {formatPrice(item.price * item.quantity, currency)}
              </div>
             </div>
           ))}
@@ -103,7 +105,7 @@ export default function CartPage() {
             </p>
 
             <p className="mt-2">
-               Total Price: <strong>{formatPrice(totalPrice)}</strong>
+               Total Price: <strong>{formatPrice(totalPrice, currency)}</strong>
             </p>
             <div className="flex gap-4 mt-6">
               <button

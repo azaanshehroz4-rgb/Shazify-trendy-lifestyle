@@ -80,7 +80,7 @@ useEffect(() => {
     </p>
 
    <p className="text-pink-600 font-bold mt-2">
-  Total: {formatPrice(order.totalPrice)}
+  Total: {formatPrice(order.totalPrice, order.currency || "PKR")}
    </p>
 
     <p className="text-green-600 mt-3 font-semibold">
@@ -108,7 +108,7 @@ useEffect(() => {
           </p>
 
           <p className="text-pink-600 font-semibold">
-          {formatPrice(product.price)}
+          {formatPrice(product.price, order.currency || "PKR")}
          </p>
         </div>
       </div>

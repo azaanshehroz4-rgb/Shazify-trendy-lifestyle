@@ -189,7 +189,7 @@ const deleteOrder = async (orderId: string) => {
 </td>
 
 <td className="p-4 font-semibold">
-  {formatPrice(order.totalPrice)}
+  {formatPrice(order.totalPrice, order.currency || "PKR")}
 </td>
 
 <td className="p-4">

@@ -274,7 +274,7 @@ return (
           </td>
 
          <td className="p-3 text-pink-600 font-bold">
-           {formatPrice(product.price)}
+           {formatPrice(product.price, "PKR")}
         </td>
 
           <td className="p-3">

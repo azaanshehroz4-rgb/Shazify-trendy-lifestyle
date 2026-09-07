@@ -156,7 +156,7 @@ const saveTrackingInfo = async () => {
 </div>
 
      <p className="text-pink-600 font-bold mt-2">
-         Total: {formatPrice(order.totalPrice)}
+        Total: {formatPrice(order.totalPrice, order.currency || "PKR")}
      </p>
 
       <p className="text-gray-600">
@@ -229,7 +229,7 @@ const saveTrackingInfo = async () => {
 </div>
 
        <p className="font-bold text-pink-600">
-             {formatPrice(item.price)}
+             {formatPrice(item.price, order.currency || "PKR")}
        </p>
       </div>
 

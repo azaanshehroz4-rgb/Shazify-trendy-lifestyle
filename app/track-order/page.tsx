@@ -115,7 +115,7 @@ if (!user) {
             </p>
 
            <p>
-            Total Price: {formatPrice(order.totalPrice)}
+            Total Price: {formatPrice(order.totalPrice, order.currency || "PKR")}
             </p>
 
             <div className="mt-8 border-t pt-8">

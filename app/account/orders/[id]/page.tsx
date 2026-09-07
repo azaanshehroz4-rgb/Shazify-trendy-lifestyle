@@ -96,7 +96,7 @@ export default function OrderDetailsPage() {
             </p>
 
            <p className="text-pink-600 font-bold">
-              Total Price: {formatPrice(order.totalPrice)}
+              Total Price: {formatPrice(order.totalPrice, order.currency || "PKR")}
             </p>
             
             <div className="mt-8 border rounded-xl p-6 bg-gray-50">
@@ -192,7 +192,7 @@ export default function OrderDetailsPage() {
                </div>
 
                  <p className="font-bold text-pink-600">
-                   {formatPrice(product.price)}
+                   {formatPrice(product.price, order.currency || "PKR")}
                 </p>
                 </div>
               ))}

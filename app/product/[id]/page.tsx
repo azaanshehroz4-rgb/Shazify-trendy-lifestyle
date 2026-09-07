@@ -167,7 +167,7 @@ const product: any = {
     offers: {
       "@type": "Offer",
       url: `${SITE_URL}/product/${id}`,
-      priceCurrency: "USD",
+      priceCurrency: "PKR",
       price: String(product.price),
       availability: "https://schema.org/InStock",
 

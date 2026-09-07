@@ -8,24 +8,7 @@ export async function POST(req: Request) {
   console.log("NOTIFICATION API HIT");
 
   try {
-    // Firebase ID token check
     const authorization = req.headers.get("authorization");
-
-    if (!authorization?.startsWith("Bearer ")) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    const idToken = authorization.split("Bearer ")[1];
-
-    // Verify logged-in user
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
-
-    const userId = decodedToken.uid;
-
-    // Get orderId
     const body = await req.json();
     const { orderId } = body;
 
@@ -50,14 +33,33 @@ export async function POST(req: Request) {
       );
     }
 
-    const order = orderSnapshot.docs[0].data();
+    const orderDoc = orderSnapshot.docs[0];
+    const order = orderDoc.data();
 
-    // Make sure order belongs to logged-in user
-    if (order.userId !== userId) {
-      return NextResponse.json(
-        { error: "You are not allowed to access this order." },
-        { status: 403 }
-      );
+    // Guest order
+    if (order.isGuestOrder === true || order.checkoutType === "guest") {
+      console.log("Guest order notification:", orderId);
+    } else {
+      // Logged-in order requires Firebase ID token
+      if (!authorization?.startsWith("Bearer ")) {
+        return NextResponse.json(
+          { error: "Unauthorized" },
+          { status: 401 }
+        );
+      }
+
+      const idToken = authorization.split("Bearer ")[1];
+
+      const decodedToken = await adminAuth.verifyIdToken(idToken);
+      const userId = decodedToken.uid;
+
+      // Make sure logged-in order belongs to user
+      if (order.userId !== userId) {
+        return NextResponse.json(
+          { error: "You are not allowed to access this order." },
+          { status: 403 }
+        );
+      }
     }
 
     // Get all admin notification tokens

@@ -1,29 +1,14 @@
 import { NextResponse } from "next/server";
 import { resend } from "../../lib/resend";
 import { adminDb, adminAuth } from "../../lib/firebaseAdmin";
+
 export const runtime = "nodejs";
+
 export async function POST(req: Request) {
   console.log("EMAIL API HIT");
 
   try {
-    // Get Firebase ID token from request
     const authorization = req.headers.get("authorization");
-
-    if (!authorization?.startsWith("Bearer ")) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    const idToken = authorization.split("Bearer ")[1];
-
-    // Verify Firebase user
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
-
-    const userId = decodedToken.uid;
-
-    // Get only orderId from browser
     const body = await req.json();
     const { orderId } = body;
 
@@ -51,18 +36,45 @@ export async function POST(req: Request) {
     const orderDoc = orderSnapshot.docs[0];
     const order = orderDoc.data();
 
-    // Make sure this order belongs to logged-in user
-    if (order.userId !== userId) {
-      return NextResponse.json(
-        { error: "You are not allowed to access this order." },
-        { status: 403 }
-      );
+    /*
+     * Guest order:
+     * No Firebase authentication is required.
+     */
+    const isGuestOrder =
+      order.isGuestOrder === true ||
+      order.checkoutType === "guest";
+
+    /*
+     * Account order:
+     * Firebase ID token is required and ownership is verified.
+     */
+    if (!isGuestOrder) {
+      if (!authorization?.startsWith("Bearer ")) {
+        return NextResponse.json(
+          { error: "Unauthorized" },
+          { status: 401 }
+        );
+      }
+
+      const idToken = authorization.split("Bearer ")[1];
+
+      const decodedToken = await adminAuth.verifyIdToken(idToken);
+
+      const userId = decodedToken.uid;
+
+      if (order.userId !== userId) {
+        return NextResponse.json(
+          { error: "You are not allowed to access this order." },
+          { status: 403 }
+        );
+      }
     }
 
     // Use Firestore data, NOT browser-supplied data
     const email = order.email;
-    const fullName = order.fullName;
+    const fullName = order.fullName || "Customer";
     const totalPrice = order.totalPrice;
+    const currency = order.currency || "PKR";
 
     if (!email) {
       return NextResponse.json(
@@ -71,13 +83,38 @@ export async function POST(req: Request) {
       );
     }
 
-         const data = await resend.emails.send({
-          from: "Shazify <orders@shazify.shop>",
-          to: email,
-          replyTo: "shazifyofficial@gmail.com",
-          subject: `Order Confirmation - ${order.orderId}`,
+    let formattedTotal = "";
+
+    switch (currency) {
+      case "PKR":
+        formattedTotal = `Rs. ${Math.round(
+          Number(totalPrice)
+        ).toLocaleString("en-PK")}`;
+        break;
+
+      case "EUR":
+        formattedTotal = `€${Number(totalPrice).toFixed(2)}`;
+        break;
+
+      case "GBP":
+        formattedTotal = `£${Number(totalPrice).toFixed(2)}`;
+        break;
+
+      case "USD":
+      default:
+        formattedTotal = `$${Number(totalPrice).toFixed(2)}`;
+        break;
+    }
+
+    const data = await resend.emails.send({
+      from: "Shazify <orders@shazify.shop>",
+      to: email,
+      replyTo: "shazifyofficial@gmail.com",
+      subject: `Order Confirmation - ${order.orderId}`,
+
       html: `
-        <div style="font-family:Arial,sans-serif;padding:30px;">
+        <div style="font-family:Arial,sans-serif;padding:30px;max-width:600px;margin:auto;">
+
           <h1 style="color:#e91e63;">
             Thank you for your order!
           </h1>
@@ -97,11 +134,11 @@ export async function POST(req: Request) {
           </p>
 
           <p>
-            <strong>Total:</strong> $${totalPrice}
+            <strong>Total:</strong> ${formattedTotal}
           </p>
 
           <p>
-            <strong>Status:</strong> ${order.status}
+            <strong>Status:</strong> ${order.status || "Pending"}
           </p>
 
           <hr>
@@ -110,6 +147,7 @@ export async function POST(req: Request) {
             Thank you for shopping with
             <strong>Shazify</strong>.
           </p>
+
         </div>
       `,
     });
@@ -121,15 +159,15 @@ export async function POST(req: Request) {
       data,
     });
 
-   } catch (error: any) {
-  console.error("ORDER EMAIL API ERROR:", error);
+  } catch (error: any) {
+    console.error("ORDER EMAIL API ERROR:", error);
 
-  return NextResponse.json(
-    {
-      error: error?.message || "Email failed",
-      name: error?.name || "UnknownError",
-    },
-    { status: 500 }
-  );
-}
+    return NextResponse.json(
+      {
+        error: error?.message || "Email failed",
+        name: error?.name || "UnknownError",
+      },
+      { status: 500 }
+    );
+  }
 }

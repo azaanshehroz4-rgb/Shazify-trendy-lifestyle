@@ -24,6 +24,7 @@ import { db } from "../../lib/firebase";
 import { useRecentlyViewed } from "../../context/RecentlyViewedContext";
 import { useAuth } from "../../context/AuthContext";
 import { formatPrice } from "../../lib/currency";
+import { useCurrency } from "../../context/CurrencyContext";
 
 export default function ProductDetails({
   product,
@@ -47,6 +48,7 @@ export default function ProductDetails({
   isInWishlist,
 } = useWishlist();
   const { user } = useAuth();
+  const { currency } = useCurrency();
   const {
   recentlyViewed,
   addRecentlyViewed,
@@ -442,11 +444,11 @@ const handleEditReview = async (review: any) => {
 
           <div className="flex items-center gap-4 mt-4">
            <span className="text-3xl font-bold text-pink-600">
-             {formatPrice(product.price)}
+             {formatPrice(product.price, currency)}
            </span>
 
            <span className="text-gray-400 line-through">
-            {formatPrice(product.oldPrice)}
+            {formatPrice(product.oldPrice, currency)}
            </span>
           </div>
 
@@ -961,7 +963,7 @@ const handleEditReview = async (review: any) => {
           <h3 className="font-bold">{item.name}</h3>
 
          <p className="text-pink-600 font-bold mt-2">
-            {formatPrice(item.price)}
+            {formatPrice(item.price, currency)}
          </p>
         </div>
       </Link>
@@ -1009,7 +1011,7 @@ const handleEditReview = async (review: any) => {
               </h3>
 
              <p className="text-pink-600 font-bold mt-2">
-                {formatPrice(item.price)}
+                {formatPrice(item.price, currency)}
              </p>
 
             </div>
