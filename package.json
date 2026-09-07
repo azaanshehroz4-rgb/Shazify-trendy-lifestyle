@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@imagekit/nodejs": "^7.11.0",
     "@stripe/stripe-js": "^9.12.1",
     "file-saver": "^2.0.5",
     "firebase": "^12.16.0",
@@ -37,8 +38,8 @@
     "typescript": "^5"
   },
   "overrides": {
-  "jwks-rsa": {
-    "jose": "4.15.9"
+    "jwks-rsa": {
+      "jose": "4.15.9"
+    }
   }
-}
 }
