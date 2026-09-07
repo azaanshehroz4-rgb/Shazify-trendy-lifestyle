@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from "../../../components/Navbar";
+import { upload } from "@imagekit/javascript";
 import Footer from "../../../components/Footer";
 import { db } from "../../../lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
@@ -69,18 +70,53 @@ export default function AddProductPage() {
   // --------------------------------
   // Image Selection
   // --------------------------------
+const handleImageUpload = async (
+  index: number,
+  file: File
+) => {
+  try {
+    setUploading(true);
 
-  const handleImageChange = (
-    index: number,
-    value: string
-  ) => {
+    // Get secure authentication parameters from our server
+    const authResponse = await fetch("/api/imagekit/auth");
+
+    if (!authResponse.ok) {
+      throw new Error("Failed to get ImageKit authentication.");
+    }
+
+    const authData = await authResponse.json();
+
+    // Upload image to ImageKit
+    const result = await upload({
+      file,
+      fileName: `${Date.now()}-${file.name}`,
+      folder: "/shazify/products",
+
+      publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!,
+
+      token: authData.token,
+      expire: authData.expire,
+      signature: authData.signature,
+    });
+
+    if (!result.url) {
+      throw new Error("ImageKit did not return an image URL.");
+    }
+
+    // Save uploaded URL in the selected image slot
     setImages((prev) => {
       const updated = [...prev];
-      updated[index] = value;
+      updated[index] = result.url!;
       return updated;
     });
-  };
 
+  } catch (error) {
+    console.error("Image upload error:", error);
+    alert("Image upload failed. Please try again.");
+  } finally {
+    setUploading(false);
+  }
+};
   // --------------------------------
   // Add Product
   // --------------------------------
@@ -245,56 +281,57 @@ export default function AddProductPage() {
               onChange={(e) => setCategory(e.target.value)}
               className="w-full border p-3 rounded-lg"
             />
+{/* Product Images */}
 
-            {/* Product Images */}
+<div className="border rounded-xl p-5">
 
-            <div className="border rounded-xl p-5">
+  <h2 className="font-bold text-xl mb-2">
+    Product Images
+  </h2>
 
-              <h2 className="font-bold text-xl mb-2">
-                Product Images
-              </h2>
+  <p className="text-gray-500 text-sm mb-5">
+    Upload up to 4 product images. The first image will be the main product image.
+  </p>
 
-              <p className="text-gray-500 text-sm mb-5">
-                Enter up to 4 images from public/images folder.
-                The first image will be the main product image.
-              </p>
+  {images.map((img, index) => (
+    <div key={index} className="mb-6">
 
-              {images.map((img, index) => (
-                <div key={index} className="mb-5">
+      <label className="block font-semibold mb-2">
+        {index === 0
+          ? "Main Product Image"
+          : `Product Image ${index + 1}`}
+      </label>
 
-                  <label className="block font-semibold mb-2">
-                    {index === 0
-                      ? "Main Product Image"
-                      : `Product Image ${index + 1}`}
-                  </label>
+      <input
+        type="file"
+        accept="image/*"
+        disabled={uploading}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
 
-                  <input
-                    type="text"
-                    value={img}
-                    onChange={(e) =>
-                      handleImageChange(index, e.target.value)
-                    }
-                    placeholder="/images/product4.jpg"
-                    className="w-full border p-3 rounded-lg"
-                  />
+          if (file) {
+            handleImageUpload(index, file);
+          }
+        }}
+        className="w-full border p-3 rounded-lg"
+      />
 
-                  {img && (
-                    <div className="mt-3">
+      {img && (
+        <div className="mt-3">
 
-                      <img
-                        src={img}
-                        alt={`Product image ${index + 1}`}
-                        className="w-32 h-32 object-cover rounded-lg border"
-                      />
+          <img
+            src={img}
+            alt={`Product image ${index + 1}`}
+            className="w-32 h-32 object-cover rounded-lg border"
+          />
 
-                    </div>
-                  )}
+        </div>
+      )}
 
-                </div>
-              ))}
+    </div>
+  ))}
 
-            </div>
-
+</div>
 {/* Price */}
 
 <div>
