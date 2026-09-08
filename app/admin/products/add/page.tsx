@@ -166,10 +166,10 @@ const handleImageUpload = async (
       return;
      
     }
-    if (!weight || Number(weight) <= 0) {
-      alert("Please enter a valid product weight in kg.");
-    return;
-    }
+   if (weight && Number(weight) <= 0) {
+  alert("Product weight must be greater than 0 kg.");
+  return;
+}
 
     // Remove empty image slots
     const cleanImages = images
@@ -209,7 +209,7 @@ const handleImageUpload = async (
         oldPrice: Number(oldPrice),
         currency: "PKR",
 
-        weight: Number(weight),
+        weight: weight.trim() ? Number(weight) : null,
 
         rating: Number(rating),
         stock: Number(stock),
