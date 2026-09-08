@@ -216,36 +216,49 @@ export default function Footer() {
           </ul>
         </div>
 
+{/* Contact */}
+<div>
+  <h3 className="font-bold text-xl mb-4">
+    Contact
+  </h3>
 
-        {/* Contact */}
-        <div>
-          <h3 className="font-bold text-xl mb-4">
-            Contact
-          </h3>
+  <p className="text-gray-400">
+    Email:
+  </p>
 
-          <p className="text-gray-400">
-            Email:
-          </p>
+  <a
+    href="mailto:shazifyofficial@gmail.com"
+    className="text-pink-500 hover:text-pink-400 transition"
+  >
+    shazifyofficial@gmail.com
+  </a>
 
-          <a
-             href="mailto: shazifyofficial@gmail.com"
-            className="text-pink-500 hover:text-pink-400 transition"
-          >
-            shazifyofficial@gmail.com
-          </a>
+  <p className="text-gray-400 mt-4">
+    Phone:
+  </p>
 
-          <p className="text-gray-400 mt-4">
-            Pakistan
-          </p>
+  <a
+    href="tel:+923394454531"
+    className="text-pink-500 hover:text-pink-400 transition"
+  >
+    +92 339 4454531
+  </a>
 
-          <Link
-            href="/contact"
-            className="inline-block mt-4 text-pink-500 hover:text-pink-400 transition"
-          >
-            Contact Us →
-          </Link>
-        </div>
+  <p className="text-gray-400 mt-4">
+    Business Address:
+  </p>
 
+  <p className="text-gray-400">
+    Chungi Amer Sidhu, Lahore, Pakistan
+  </p>
+
+  <Link
+    href="/contact"
+    className="inline-block mt-4 text-pink-500 hover:text-pink-400 transition"
+  >
+    Contact Us →
+  </Link>
+</div>
 
         {/* Wishlist + Cart */}
         <div className="md:col-span-4 flex gap-5 mt-2">
