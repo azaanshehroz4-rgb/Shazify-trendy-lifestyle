@@ -44,7 +44,7 @@ const categories = Array.from(categoriesMap.values());
           {categories.map((category) => (
             <Link
               key={category}
-              href={`/category/${category}`}
+              href={`/category/${encodeURIComponent(category)}`}
               className="bg-pink-600 text-white rounded-2xl p-10 text-center text-2xl font-bold hover:bg-pink-700 transition"
             >
               {category}

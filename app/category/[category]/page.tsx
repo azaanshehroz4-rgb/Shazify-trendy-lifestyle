@@ -78,10 +78,13 @@ export default async function CategoryPage({
     ...doc.data(),
   }));
 
-  const filteredProducts = products.filter(
-    (product: any) =>
-      product.category.toLowerCase() === category.toLowerCase()
-  );
+  const decodedCategory = decodeURIComponent(category);
+
+const filteredProducts = products.filter(
+  (product: any) =>
+    product.category?.trim().toLowerCase() ===
+    decodedCategory.trim().toLowerCase()
+);
 
   return (
     <div className="max-w-7xl mx-auto p-10">
