@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 
   verification: {
     other: {
-      "p:domain_verify": "67f69a955781f64cb0030a588efa344c",
+      "p:domain_verify": "67f69a957781f64cb0030a588efa344c",
     },
   },
 
