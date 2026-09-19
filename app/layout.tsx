@@ -21,6 +21,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://shazify.shop"),
 
+  verification: {
+    other: {
+      "p:domain_verify": "67f69a955781f64cb0030a588efa344c",
+    },
+  },
+
   title: {
     default: "Shazify Trendy Lifestyle",
     template: "%s | Shazify",
