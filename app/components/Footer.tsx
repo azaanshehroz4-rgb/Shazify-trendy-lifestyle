@@ -20,7 +20,7 @@ export default function Footer() {
 
       <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-10 px-6 py-12">
 
-        {/* Logo */}
+        {/* Logo & Social */}
         <div>
           <Link href="/" className="inline-block">
             <h2 className="text-3xl font-bold text-pink-500">
@@ -35,7 +35,6 @@ export default function Footer() {
           {/* Social Media */}
           <div className="flex gap-4 mt-6">
 
-            {/* Pinterest */}
             <a
               href="https://www.pinterest.com/shazifyofficial/"
               target="_blank"
@@ -46,7 +45,6 @@ export default function Footer() {
               <FaPinterest size={22} />
             </a>
 
-            {/* Instagram */}
             <a
               href="#"
               target="_blank"
@@ -57,7 +55,6 @@ export default function Footer() {
               <FaInstagram size={22} />
             </a>
 
-            {/* TikTok */}
             <a
               href="#"
               target="_blank"
@@ -68,7 +65,6 @@ export default function Footer() {
               <FaTiktok size={22} />
             </a>
 
-            {/* Facebook */}
             <a
               href="#"
               target="_blank"
@@ -79,7 +75,6 @@ export default function Footer() {
               <FaFacebook size={22} />
             </a>
 
-            {/* YouTube */}
             <a
               href="#"
               target="_blank"
@@ -113,8 +108,8 @@ export default function Footer() {
 
             <li>
               <Link
-                 href="/"
-                 className="hover:text-pink-500 transition"
+                href="/"
+                className="hover:text-pink-500 transition"
               >
                 Products
               </Link>
@@ -139,31 +134,67 @@ export default function Footer() {
             </li>
 
             <li>
-            <Link href="/privacy" className="hover:text-pink-500 transition">
-               Privacy Policy
-            </Link>
+              <Link
+                href="/about"
+                className="hover:text-pink-500 transition"
+              >
+                About Us
+              </Link>
             </li>
 
             <li>
-            <Link href="/terms" className="hover:text-pink-500 transition">
-               Terms & Conditions
-            </Link>
+              <Link
+                href="/contact"
+                className="hover:text-pink-500 transition"
+              >
+                Contact Us
+              </Link>
             </li>
 
             <li>
-            <Link href="/refund" className="hover:text-pink-500 transition">
-               Refund & Return Policy
-            </Link>
+              <Link
+                href="/privacy"
+                className="hover:text-pink-500 transition"
+              >
+                Privacy Policy
+              </Link>
             </li>
 
             <li>
-          <Link
-            href="/affiliate-disclosure"
-            className="hover:text-pink-500 transition"
-          >
-               Affiliate Disclosure
-          </Link>
-          </li>
+              <Link
+                href="/terms"
+                className="hover:text-pink-500 transition"
+              >
+                Terms & Conditions
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                href="/refund"
+                className="hover:text-pink-500 transition"
+              >
+                Refund & Return Policy
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                href="/shipping"
+                className="hover:text-pink-500 transition"
+              >
+                Shipping & Delivery
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                href="/affiliate-disclosure"
+                className="hover:text-pink-500 transition"
+              >
+                Affiliate Disclosure
+              </Link>
+            </li>
 
           </ul>
         </div>
@@ -216,49 +247,51 @@ export default function Footer() {
           </ul>
         </div>
 
-{/* Contact */}
-<div>
-  <h3 className="font-bold text-xl mb-4">
-    Contact
-  </h3>
 
-  <p className="text-gray-400">
-    Email:
-  </p>
+        {/* Contact */}
+        <div>
+          <h3 className="font-bold text-xl mb-4">
+            Contact
+          </h3>
 
-  <a
-    href="mailto:shazifyofficial@gmail.com"
-    className="text-pink-500 hover:text-pink-400 transition"
-  >
-    shazifyofficial@gmail.com
-  </a>
+          <p className="text-gray-400">
+            Email:
+          </p>
 
-  <p className="text-gray-400 mt-4">
-    Phone:
-  </p>
+          <a
+            href="mailto:shazifyofficial@gmail.com"
+            className="text-pink-500 hover:text-pink-400 transition"
+          >
+            shazifyofficial@gmail.com
+          </a>
 
-  <a
-    href="tel:+923394454531"
-    className="text-pink-500 hover:text-pink-400 transition"
-  >
-    +92 339 4454531
-  </a>
+          <p className="text-gray-400 mt-4">
+            Phone:
+          </p>
 
-  <p className="text-gray-400 mt-4">
-    Business Address:
-  </p>
+          <a
+            href="tel:+923394454531"
+            className="text-pink-500 hover:text-pink-400 transition"
+          >
+            +92 339 4454531
+          </a>
 
-  <p className="text-gray-400">
-    Chungi Amer Sidhu, Lahore, Pakistan
-  </p>
+          <p className="text-gray-400 mt-4">
+            Business Address:
+          </p>
 
-  <Link
-    href="/contact"
-    className="inline-block mt-4 text-pink-500 hover:text-pink-400 transition"
-  >
-    Contact Us →
-  </Link>
-</div>
+          <p className="text-gray-400">
+            Chungi Amer Sidhu, Lahore, Pakistan
+          </p>
+
+          <Link
+            href="/contact"
+            className="inline-block mt-4 text-pink-500 hover:text-pink-400 transition"
+          >
+            Contact Us →
+          </Link>
+        </div>
+
 
         {/* Wishlist + Cart */}
         <div className="md:col-span-4 flex gap-5 mt-2">
