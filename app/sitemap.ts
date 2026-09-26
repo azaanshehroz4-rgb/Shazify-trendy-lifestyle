@@ -8,37 +8,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: SITE_URL,
-      lastModified: new Date(),
       changeFrequency: "daily",
       priority: 1,
     },
     {
       url: `${SITE_URL}/contact`,
-      lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
       url: `${SITE_URL}/privacy`,
-      lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 0.3,
     },
     {
       url: `${SITE_URL}/terms`,
-      lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 0.3,
     },
     {
       url: `${SITE_URL}/refund`,
-      lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 0.3,
     },
     {
       url: `${SITE_URL}/affiliate-disclosure`,
-      lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 0.3,
     },
@@ -46,14 +40,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const snapshot = await getDocs(collection(db, "products"));
 
-  const products = snapshot.docs.map((doc) => ({
-    id: doc.id,
-    category: doc.data().category,
-  }));
+  const products = snapshot.docs.map((doc) => {
+    const data = doc.data();
+
+    return {
+      id: doc.id,
+      category: data.category,
+      createdAt: data.createdAt,
+    };
+  });
 
   const productPages: MetadataRoute.Sitemap = products.map((product) => ({
     url: `${SITE_URL}/product/${product.id}`,
-    lastModified: new Date(),
+    lastModified: product.createdAt?.toDate?.() ?? undefined,
     changeFrequency: "weekly",
     priority: 0.8,
   }));
@@ -63,14 +62,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       products
         .map((product) => product.category)
         .filter(Boolean)
-        .map((category) => category.toLowerCase())
+        .map((category) => String(category).trim().toLowerCase())
     ),
   ];
 
   const categoryPages: MetadataRoute.Sitemap = uniqueCategories.map(
     (category) => ({
       url: `${SITE_URL}/category/${category}`,
-      lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.7,
     })

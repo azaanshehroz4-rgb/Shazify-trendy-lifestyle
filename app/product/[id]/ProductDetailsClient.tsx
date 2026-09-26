@@ -153,14 +153,17 @@ const filteredReviews = sortedReviews.filter((review: any) => {
 }
 
 setQuestionsLoading(false);
-    const reviewSnapshot = await getDocs(collection(db, "reviews"));
+  const reviewsQuery = query(
+  collection(db, "reviews"),
+  where("productId", "==", product.id)
+);
 
-const reviewData = reviewSnapshot.docs
-  .map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }))
-  .filter((review: any) => review.productId === product.id);
+const reviewSnapshot = await getDocs(reviewsQuery);
+
+const reviewData = reviewSnapshot.docs.map((doc) => ({
+  id: doc.id,
+  ...doc.data(),
+}));
 
 setReviews(reviewData);
 if (reviewData.length > 0) {
@@ -214,9 +217,17 @@ useEffect(() => {
 const handlePinterestShare = () => {
   const pageUrl = window.location.href;
 
-  const imageUrl = product.image;
+  const imageUrl = product.image?.startsWith("http")
+    ? product.image
+    : `${window.location.origin}${
+        product.image?.startsWith("/")
+          ? product.image
+          : `/${product.image || ""}`
+      }`;
 
-  const description = `${product.name} - ${product.description || ""}`;
+  const description = `${product.name} - ${
+    product.description || ""
+  }`;
 
   const pinterestUrl = `https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(
     pageUrl
@@ -252,21 +263,19 @@ const handleSubmitReview = async () => {
     setReviewRating(5);
     setReviewComment("");
 
-    const reviewSnapshot = await getDocs(
-      collection(db, "reviews")
-    );
+   const reviewsQuery = query(
+  collection(db, "reviews"),
+  where("productId", "==", product.id)
+);
 
-    const reviewData = reviewSnapshot.docs
-      .map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
-      .filter(
-        (review: any) =>
-          review.productId === product.id
-      );
+const reviewSnapshot = await getDocs(reviewsQuery);
 
-    setReviews(reviewData);
+const reviewData = reviewSnapshot.docs.map((doc) => ({
+  id: doc.id,
+  ...doc.data(),
+}));
+
+setReviews(reviewData);
 
   } catch (error) {
     console.error("Submit review error:", error);
@@ -542,18 +551,18 @@ const handleEditReview = async (review: any) => {
 
              {product.affiliateLink ? (
   <div className="mt-8 space-y-3 border-t pt-6">
-    <p className="text-gray-600">
-      🛍️ Sold on AliExpress
-    </p>
+   <p className="text-gray-600">
+  🛍️ Available through a third-party retailer
+</p>
 
-    <p className="text-gray-600">
-      🔗 Click "Buy on AliExpress" to view this product.
-    </p>
+<p className="text-gray-600">
+  🔗 Click "Buy on AliExpress" to view the product and complete your purchase.
+</p>
 
-    <p className="text-gray-600">
-      🔒 Secure purchase through AliExpress
-    </p>
-  </div>
+<p className="text-gray-600">
+  🔒 Purchase is completed on the third-party retailer's checkout.
+</p>
+ </div>
 ) : (
   <div className="mt-8 space-y-3 border-t pt-6">
 

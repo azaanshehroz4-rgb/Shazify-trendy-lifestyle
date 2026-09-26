@@ -1,12 +1,22 @@
 import { db } from "../../lib/firebase";
-import { doc, getDoc, collection, getDocs } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import ProductDetails from "./ProductDetailsClient";
 import type { Metadata } from "next";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://www.shazify.shop";
+
 function getImageUrl(image: string) {
-  if (!image) return `${SITE_URL}/images/default-product.jpg`;
+  if (!image) {
+    return `${SITE_URL}/images/default-product.jpg`;
+  }
 
   if (image.startsWith("http://") || image.startsWith("https://")) {
     return image;
@@ -28,7 +38,8 @@ export async function generateMetadata({
   if (!docSnap.exists()) {
     return {
       title: "Product Not Found | Shazify",
-      description: "The requested product could not be found on Shazify.",
+      description:
+        "The requested product could not be found on Shazify.",
     };
   }
 
@@ -82,6 +93,7 @@ export async function generateMetadata({
     },
   };
 }
+
 export default async function ProductPage({
   params,
 }: {
@@ -90,40 +102,47 @@ export default async function ProductPage({
   const { id } = await params;
 
   const docRef = doc(db, "products", id);
-
   const docSnap = await getDoc(docRef);
 
   if (!docSnap.exists()) {
     return <div>Product not found.</div>;
   }
 
-  const reviewSnapshot = await getDocs(collection(db, "reviews"));
+  // Only fetch reviews for this product
+  const reviewsQuery = query(
+    collection(db, "reviews"),
+    where("productId", "==", id)
+  );
 
-const productReviews = reviewSnapshot.docs
-  .map((reviewDoc) => reviewDoc.data())
-  .filter((review: any) => review.productId === id);
+  const reviewSnapshot = await getDocs(reviewsQuery);
 
-const totalReviews = productReviews.length;
+  const productReviews = reviewSnapshot.docs.map((reviewDoc) =>
+    reviewDoc.data()
+  );
 
-const averageRating =
-  totalReviews > 0
-    ? productReviews.reduce(
-        (sum: number, review: any) => sum + Number(review.rating || 0),
-        0
-      ) / totalReviews
-    : 0;
+  const totalReviews = productReviews.length;
 
- const data = docSnap.data();
+  const averageRating =
+    totalReviews > 0
+      ? productReviews.reduce(
+          (sum: number, review: any) =>
+            sum + Number(review.rating || 0),
+          0
+        ) / totalReviews
+      : 0;
 
-const product: any = {
-  id: docSnap.id,
-  ...data,
+  const data = docSnap.data();
 
-  createdAt: data.createdAt?.toDate
-    ? data.createdAt.toDate().toISOString()
-    : data.createdAt ?? null,
-};
-  const productSchema = {
+  const product: any = {
+    id: docSnap.id,
+    ...data,
+
+    createdAt: data.createdAt?.toDate
+      ? data.createdAt.toDate().toISOString()
+      : data.createdAt ?? null,
+  };
+
+  const productSchema: any = {
     "@context": "https://schema.org",
     "@type": "Product",
 
@@ -153,29 +172,40 @@ const product: any = {
 
     sku: product.id,
 
-    aggregateRating:
-  totalReviews > 0
-    ? {
-        "@type": "AggregateRating",
-        ratingValue: Number(averageRating.toFixed(1)),
-        reviewCount: totalReviews,
-        bestRating: 5,
-        worstRating: 1,
-      }
-    : undefined,
+    ...(totalReviews > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: Number(averageRating.toFixed(1)),
+            reviewCount: totalReviews,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        }
+      : {}),
 
-    offers: {
-      "@type": "Offer",
-      url: `${SITE_URL}/product/${id}`,
-      priceCurrency: "PKR",
-      price: String(product.price),
-      availability: "https://schema.org/InStock",
+    // Only Shazify-owned products get a Shazify Offer.
+    // Affiliate products do not claim Shazify as their seller.
+    ...(product.affiliateLink
+      ? {}
+      : {
+          offers: {
+            "@type": "Offer",
+            url: `${SITE_URL}/product/${id}`,
+            priceCurrency: "PKR",
+            price: String(product.price),
 
-      seller: {
-        "@type": "Organization",
-        name: "Shazify",
-      },
-    },
+            availability:
+              Number(product.stock || 0) > 0
+                ? "https://schema.org/InStock"
+                : "https://schema.org/OutOfStock",
+
+            seller: {
+              "@type": "Organization",
+              name: "Shazify",
+            },
+          },
+        }),
   };
 
   return (
@@ -183,7 +213,10 @@ const product: any = {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(productSchema).replace(/</g, "\\u003c"),
+          __html: JSON.stringify(productSchema).replace(
+            /</g,
+            "\\u003c"
+          ),
         }}
       />
 
