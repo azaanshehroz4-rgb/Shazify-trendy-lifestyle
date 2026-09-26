@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
     },
 
-    sitemap: "https://shazify.shop/sitemap.xml",
+    sitemap: "https://www.shazify.shop/sitemap.xml",
   };
 }
