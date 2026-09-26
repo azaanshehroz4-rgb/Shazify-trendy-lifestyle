@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import FeaturedProducts from "./components/FeaturedProducts";
+import FeaturedProducts from "./components/components/FeaturedProductsClient";
 import Categories from "./components/Categories";
 import Footer from "./components/Footer";
 
