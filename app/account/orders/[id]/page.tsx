@@ -287,6 +287,8 @@ export default function OrderDetailsPage() {
       ? "https://ep.gov.pk/track"
       : order.courier === "DHL"
       ? "https://www.dhl.com/global-en/home/tracking.html"
+      : order.courier === "PostEx"
+      ? "https://postex.pk/tracking"
       : "#"
   }
   target="_blank"
