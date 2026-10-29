@@ -266,6 +266,7 @@ const saveTrackingInfo = async () => {
       <option value="M&P">M&P</option>
       <option value="Pakistan Post">Pakistan Post</option>
       <option value="DHL">DHL</option>
+      <option value="PostEx">PostEx</option>
     </select>
 
     <button
