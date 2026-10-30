@@ -25,11 +25,14 @@ export default function MyOrdersPage() {
 
     const fetchOrders = async () => {
       try {
-        const q = query(
-          collection(db, "orders"),
-          where("userId", "==", user.uid),
-          orderBy("createdAt", "desc")
-        );
+       
+const q = query(
+  collection(db, "orders"),
+  where("userId", "==", user.uid),
+  where("checkoutType", "==", "account"),
+  orderBy("createdAt", "desc")
+);
+
 
         const snapshot = await getDocs(q);
 
