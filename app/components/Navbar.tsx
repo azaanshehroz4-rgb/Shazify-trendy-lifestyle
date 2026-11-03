@@ -1,5 +1,7 @@
+
 "use client";
 
+import Image from "next/image";
 import { Heart, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useWishlist } from "../context/WishlistContext";
@@ -26,9 +28,7 @@ export default function Navbar() {
     setMenuOpen(false);
   };
 
-  const handleCurrencyChange = (
-    newCurrency: Currency
-  ) => {
+  const handleCurrencyChange = (newCurrency: Currency) => {
     setCurrency(newCurrency);
   };
 
@@ -42,18 +42,30 @@ export default function Navbar() {
     <>
       {/* TOP HEADER */}
       <header className="bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
 
           {/* Desktop + Mobile Top Row */}
           <div className="flex items-center justify-between gap-3">
 
-            {/* Logo */}
+            {/* SHAZIFY LOGO */}
             <Link
               href="/"
               onClick={closeMenu}
-              className="text-2xl sm:text-3xl font-extrabold text-pink-600 shrink-0"
+              className="flex items-center gap-2 shrink-0"
+              aria-label="Shazify Home"
             >
-              SHAZIFY
+              <Image
+                src="/shazify-monogram.png"
+                alt="Shazify Shopping Bag Logo"
+                width={55}
+                height={55}
+                priority
+                className="object-contain w-11 h-11 sm:w-14 sm:h-14"
+              />
+
+              <span className="text-xl sm:text-2xl font-extrabold tracking-wide text-[#8B004B]">
+                SHAZIFY
+              </span>
             </Link>
 
             {/* Search - Desktop */}
@@ -72,9 +84,7 @@ export default function Navbar() {
               <select
                 value={currency}
                 onChange={(e) =>
-                  handleCurrencyChange(
-                    e.target.value as Currency
-                  )
+                  handleCurrencyChange(e.target.value as Currency)
                 }
                 className="border border-pink-600 text-pink-600 rounded-lg px-3 py-2.5 font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-pink-500"
               >
@@ -110,6 +120,7 @@ export default function Navbar() {
               onClick={() => setMenuOpen(!menuOpen)}
               className="md:hidden text-pink-600 p-2"
               aria-label="Toggle menu"
+              aria-expanded={menuOpen}
             >
               {menuOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
@@ -136,79 +147,49 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden md:flex max-w-7xl mx-auto items-center gap-8 px-6 py-4 font-semibold">
 
-          <Link
-            href="/"
-            className="hover:text-yellow-300 transition"
-          >
+          <Link href="/" className="hover:text-yellow-300 transition">
             Home
           </Link>
 
-          <Link
-            href="/categories"
-            className="hover:text-yellow-300 transition"
-          >
+          <Link href="/categories" className="hover:text-yellow-300 transition">
             Categories
           </Link>
 
-          <Link
-            href="/deals"
-            className="hover:text-yellow-300 transition"
-          >
+          <Link href="/deals" className="hover:text-yellow-300 transition">
             Deals
           </Link>
 
-          <Link
-            href="/about"
-            className="hover:text-yellow-300 transition"
-          >
+          <Link href="/about" className="hover:text-yellow-300 transition">
             About
           </Link>
 
-          <Link
-            href="/contact"
-            className="hover:text-yellow-300 transition"
-          >
+          <Link href="/contact" className="hover:text-yellow-300 transition">
             Contact
           </Link>
 
           {user ? (
             <>
-              <Link
-                href="/account"
-                className="hover:text-yellow-300 transition"
-              >
+              <Link href="/account" className="hover:text-yellow-300 transition">
                 My Account
               </Link>
 
               {user.email === "shazifyofficial@gmail.com" && (
-                <Link
-                  href="/admin"
-                  className="hover:text-yellow-300 transition"
-                >
+                <Link href="/admin" className="hover:text-yellow-300 transition">
                   Admin Dashboard
                 </Link>
               )}
 
-              <button
-                onClick={handleLogout}
-                className="hover:text-yellow-300 transition"
-              >
+              <button onClick={handleLogout} className="hover:text-yellow-300 transition">
                 Logout
               </button>
             </>
           ) : (
             <>
-              <Link
-                href="/login"
-                className="hover:text-yellow-300 transition"
-              >
+              <Link href="/login" className="hover:text-yellow-300 transition">
                 Login
               </Link>
 
-              <Link
-                href="/signup"
-                className="hover:text-yellow-300 transition"
-              >
+              <Link href="/signup" className="hover:text-yellow-300 transition">
                 Sign Up
               </Link>
             </>
@@ -220,43 +201,23 @@ export default function Navbar() {
         {menuOpen && (
           <div className="md:hidden px-5 pb-5 pt-3 space-y-3 font-semibold">
 
-            <Link
-              href="/"
-              onClick={closeMenu}
-              className="block py-2 hover:text-yellow-300"
-            >
+            <Link href="/" onClick={closeMenu} className="block py-2 hover:text-yellow-300">
               Home
             </Link>
 
-            <Link
-              href="/categories"
-              onClick={closeMenu}
-              className="block py-2 hover:text-yellow-300"
-            >
+            <Link href="/categories" onClick={closeMenu} className="block py-2 hover:text-yellow-300">
               Categories
             </Link>
 
-            <Link
-              href="/deals"
-              onClick={closeMenu}
-              className="block py-2 hover:text-yellow-300"
-            >
+            <Link href="/deals" onClick={closeMenu} className="block py-2 hover:text-yellow-300">
               Deals
             </Link>
 
-            <Link
-              href="/about"
-              onClick={closeMenu}
-              className="block py-2 hover:text-yellow-300"
-            >
+            <Link href="/about" onClick={closeMenu} className="block py-2 hover:text-yellow-300">
               About
             </Link>
 
-            <Link
-              href="/contact"
-              onClick={closeMenu}
-              className="block py-2 hover:text-yellow-300"
-            >
+            <Link href="/contact" onClick={closeMenu} className="block py-2 hover:text-yellow-300">
               Contact
             </Link>
 
@@ -265,9 +226,7 @@ export default function Navbar() {
               <select
                 value={currency}
                 onChange={(e) =>
-                  handleCurrencyChange(
-                    e.target.value as Currency
-                  )
+                  handleCurrencyChange(e.target.value as Currency)
                 }
                 className="w-full border border-white rounded-lg px-3 py-2.5 bg-white text-pink-600 font-semibold focus:outline-none"
               >
@@ -280,46 +239,27 @@ export default function Navbar() {
 
             {user ? (
               <>
-                <Link
-                  href="/account"
-                  onClick={closeMenu}
-                  className="block py-2 hover:text-yellow-300"
-                >
+                <Link href="/account" onClick={closeMenu} className="block py-2 hover:text-yellow-300">
                   My Account
                 </Link>
 
                 {user.email === "shazifyofficial@gmail.com" && (
-                  <Link
-                    href="/admin"
-                    onClick={closeMenu}
-                    className="block py-2 hover:text-yellow-300"
-                  >
+                  <Link href="/admin" onClick={closeMenu} className="block py-2 hover:text-yellow-300">
                     Admin Dashboard
                   </Link>
                 )}
 
-                <button
-                  onClick={handleLogout}
-                  className="block py-2 hover:text-yellow-300"
-                >
+                <button onClick={handleLogout} className="block py-2 hover:text-yellow-300">
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <Link
-                  href="/login"
-                  onClick={closeMenu}
-                  className="block py-2 hover:text-yellow-300"
-                >
+                <Link href="/login" onClick={closeMenu} className="block py-2 hover:text-yellow-300">
                   Login
                 </Link>
 
-                <Link
-                  href="/signup"
-                  onClick={closeMenu}
-                  className="block py-2 hover:text-yellow-300"
-                >
+                <Link href="/signup" onClick={closeMenu} className="block py-2 hover:text-yellow-300">
                   Sign Up
                 </Link>
               </>
