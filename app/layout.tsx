@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -20,6 +21,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.shazify.shop"),
+
+  icons: {
+    icon: "/shazify-monogram.png",
+    shortcut: "/shazify-monogram.png",
+    apple: "/shazify-monogram.png",
+  },
 
   verification: {
     other: {
@@ -87,13 +94,13 @@ export default function RootLayout({
         <CartProvider>
           <SearchProvider>
             <CurrencyProvider>
-            <AuthProvider>
-              <WishlistProvider>
-                <RecentlyViewedProvider>
-                  {children}
-                </RecentlyViewedProvider>
-              </WishlistProvider>
-            </AuthProvider>
+              <AuthProvider>
+                <WishlistProvider>
+                  <RecentlyViewedProvider>
+                    {children}
+                  </RecentlyViewedProvider>
+                </WishlistProvider>
+              </AuthProvider>
             </CurrencyProvider>
           </SearchProvider>
         </CartProvider>
