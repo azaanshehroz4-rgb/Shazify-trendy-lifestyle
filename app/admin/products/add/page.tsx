@@ -4,7 +4,7 @@ import Navbar from "../../../components/Navbar";
 import { upload } from "@imagekit/javascript";
 import Footer from "../../../components/Footer";
 import { db } from "../../../lib/firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, doc, writeBatch } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../context/AuthContext";
 import { useEffect, useState, useRef } from "react";
@@ -17,6 +17,7 @@ export default function AddProductPage() {
   // Product fields
   const [stock, setStock] = useState("");
   const [name, setName] = useState("");
+  const [sku, setSku] = useState("");
   const [category, setCategory] = useState("");
 
   // Prices are entered in PKR
@@ -126,6 +127,10 @@ const handleImageUpload = async (
     if (submittingRef.current) {
       return;
     }
+      if (uploading) {
+    alert("Please wait until image upload finishes.");
+    return;
+  }
 
     // --------------------------------
     // Basic validation
@@ -177,7 +182,7 @@ const handleImageUpload = async (
       .filter((img) => img !== "");
 
     if (cleanImages.length === 0) {
-      alert("Please enter at least one product image path.");
+      alert("Please upload at least one product image.");
       return;
     }
 
@@ -190,42 +195,62 @@ const handleImageUpload = async (
       // Save Product
       // --------------------------------
 
-      await addDoc(collection(db, "products"), {
-        name: name.trim(),
-        category: category.trim(),
+    
+      // Generate Shazify Product ID
+const productRef = doc(collection(db, "products"));
 
-        // Main image
-        image: cleanImages[0],
+// Private Markaz SKU document
+const privateProductRef = doc(
+  db,
+  "privateProductData",
+  productRef.id
+);
 
-        // All product images
-        images: cleanImages,
+// Create atomic batch
+const batch = writeBatch(db);
 
-        // --------------------------------
-        // PRICE SYSTEM
-        // Base price is PKR
-        // --------------------------------
+// Public product data
+// IMPORTANT: Markaz SKU is NOT included here.
+batch.set(productRef, {
+  name: name.trim(),
+  category: category.trim(),
 
-        price: Number(price),
-        oldPrice: Number(oldPrice),
-        currency: "PKR",
+  // Main image
+  image: cleanImages[0],
 
-        weight: weight.trim() ? Number(weight) : null,
+  // All product images
+  images: cleanImages,
 
-        rating: Number(rating),
-        stock: Number(stock),
+  price: Number(price),
+  oldPrice: Number(oldPrice),
+  currency: "PKR",
 
-        description: description.trim(),
+  weight: weight.trim() ? Number(weight) : null,
 
-        pinterestTitle: pinterestTitle.trim(),
-        pinterestDescription: pinterestDescription.trim(),
+  rating: Number(rating),
+  stock: Number(stock),
 
-        affiliateLink: affiliateLink.trim(),
+  description: description.trim(),
 
-        // Deals
-        isDeal,
+  pinterestTitle: pinterestTitle.trim(),
+  pinterestDescription: pinterestDescription.trim(),
 
-        createdAt: new Date(),
-      });
+  affiliateLink: affiliateLink.trim(),
+
+  isDeal,
+
+  createdAt: new Date(),
+});
+
+// Private data: Admin only
+batch.set(privateProductRef, {
+  shazifyProductId: productRef.id,
+  markazSku: sku.trim().toUpperCase() || null,
+  updatedAt: new Date(),
+});
+
+// Save both documents together
+await batch.commit();
 
       await logActivity(`Product Added: ${name}`);
 
@@ -271,6 +296,25 @@ const handleImageUpload = async (
               onChange={(e) => setName(e.target.value)}
               className="w-full border p-3 rounded-lg"
             />
+            {/* Markaz SKU */}
+
+<div>
+  <label className="block font-semibold mb-2">
+    Markaz SKU Code
+  </label>
+
+  <input
+    type="text"
+    placeholder="Enter Markaz SKU (Example: 123456789)"
+    value={sku}
+    onChange={(e) => setSku(e.target.value.toUpperCase())}
+    className="w-full border p-3 rounded-lg"
+  />
+
+  <p className="text-sm text-gray-500 mt-1">
+    Enter the original SKU code from Markaz.
+  </p>
+</div>
 
             {/* Category */}
 

@@ -475,7 +475,7 @@ export default function CheckoutPage() {
 
                 <div>
                   <p className="font-bold">
-                    💳 Stripe Card
+                    💳 Pay Fast
                   </p>
 
                   <p className="text-sm text-gray-500">

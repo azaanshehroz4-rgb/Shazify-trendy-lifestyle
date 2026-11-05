@@ -5,7 +5,12 @@ import Footer from "../../../components/Footer";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { db } from "../../../lib/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  writeBatch,
+  deleteField,
+} from "firebase/firestore";
 import { logActivity } from "../../../lib/activityLogger";
 
 export default function EditProductPage() {
@@ -13,6 +18,7 @@ export default function EditProductPage() {
   const router = useRouter();
 
   const [name, setName] = useState("");
+  const [sku, setSku] = useState("");
   const [category, setCategory] = useState("");
 
   // Main image
@@ -49,6 +55,13 @@ export default function EditProductPage() {
         );
 
         const docSnap = await getDoc(docRef);
+        const privateDocRef = doc(
+  db,
+  "privateProductData",
+  params.id as string
+);
+
+const privateDocSnap = await getDoc(privateDocRef);
 
         if (docSnap.exists()) {
           const data = docSnap.data();
@@ -56,6 +69,11 @@ export default function EditProductPage() {
           console.log(data);
 
           setName(data.name || "");
+          setSku(
+  privateDocSnap.data()?.markazSku ||
+  data.sku ||
+  ""
+);
           setCategory(data.category || "");
 
           setImage(data.image || "");
@@ -205,43 +223,68 @@ export default function EditProductPage() {
           ? cleanImages[0]
           : image;
 
-      await updateDoc(
-        doc(
-          db,
-          "products",
-          params.id as string
-        ),
-        {
-          name: name.trim(),
-          category: category.trim(),
+    // Product references
+const productRef = doc(
+  db,
+  "products",
+  params.id as string
+);
 
-          // Main image
-          image: mainImage,
+const privateProductRef = doc(
+  db,
+  "privateProductData",
+  params.id as string
+);
 
-          // Gallery images
-          images: cleanImages,
+// Create batch
+const batch = writeBatch(db);
 
-          price: Number(price),
-          oldPrice: Number(oldPrice),
-          rating: Number(rating),
+// Update public product
+// Markaz SKU is removed from public document.
+batch.update(productRef, {
+  name: name.trim(),
 
-          description: description.trim(),
+  category: category.trim(),
 
-          pinterestTitle:
-            pinterestTitle.trim(),
+  image: mainImage,
+  images: cleanImages,
 
-          pinterestDescription:
-            pinterestDescription.trim(),
+  price: Number(price),
+  oldPrice: Number(oldPrice),
+  rating: Number(rating),
 
-          affiliateLink:
-            affiliateLink.trim(),
+  description: description.trim(),
 
-          stock: Number(stock),
+  pinterestTitle: pinterestTitle.trim(),
 
-          // Deals
-          isDeal,
-        }
-      );
+  pinterestDescription:
+    pinterestDescription.trim(),
+
+  affiliateLink: affiliateLink.trim(),
+
+  stock: Number(stock),
+
+  isDeal,
+
+  // Remove old public SKU
+  sku: deleteField(),
+});
+
+// Save Markaz SKU privately
+batch.set(
+  privateProductRef,
+  {
+    shazifyProductId: params.id as string,
+
+    markazSku: sku.trim().toUpperCase() || null,
+
+    updatedAt: new Date(),
+  },
+  { merge: true }
+);
+
+// Save both changes together
+await batch.commit();
 
       await logActivity(
         `Product Updated: ${name}`
@@ -294,6 +337,21 @@ export default function EditProductPage() {
               }
               className="w-full border p-3 rounded-lg"
             />
+            {/* Markaz SKU */}
+
+<div>
+  <label className="block font-semibold mb-2">
+    Markaz SKU Code
+  </label>
+
+  <input
+    type="text"
+    placeholder="Enter Markaz SKU"
+    value={sku}
+    onChange={(e) => setSku(e.target.value.toUpperCase())}
+    className="w-full border p-3 rounded-lg"
+  />
+</div>
 
             {/* Category */}
 

@@ -8,8 +8,9 @@ import { db } from "../../lib/firebase";
 import {
   collection,
   getDocs,
-  deleteDoc,
   doc,
+  writeBatch,
+  deleteField,
 } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation"
@@ -44,26 +45,114 @@ useEffect(() => {
   }
 }, [user, loading, router]);
 useEffect(() => {
+  if (loading) return;
+
+  if (!user || user.email !== ADMIN_EMAIL) {
+    setProductsLoading(false);
+    return;
+  }
+
   const fetchProducts = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "products"));
+      const [productsSnapshot, privateSnapshot] =
+        await Promise.all([
+          getDocs(collection(db, "products")),
+          getDocs(collection(db, "privateProductData")),
+        ]);
 
-      const productsData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const privateSkuMap = new Map<string, any>();
+
+      privateSnapshot.docs.forEach((privateDoc) => {
+        privateSkuMap.set(privateDoc.id, privateDoc.data());
+      });
+
+      const oldProducts = productsSnapshot.docs.filter(
+        (productDoc) => {
+          const data = productDoc.data();
+
+          return (
+            typeof data.sku === "string" &&
+            data.sku.trim() !== ""
+          );
+        }
+      );
+
+      for (let i = 0; i < oldProducts.length; i += 200) {
+        const batch = writeBatch(db);
+        const chunk = oldProducts.slice(i, i + 200);
+
+        chunk.forEach((productDoc) => {
+          const data = productDoc.data();
+
+          const existingPrivateData =
+            privateSkuMap.get(productDoc.id);
+
+          const markazSku =
+            existingPrivateData?.markazSku ||
+            data.sku ||
+            null;
+
+          const privateRef = doc(
+            db,
+            "privateProductData",
+            productDoc.id
+          );
+
+          batch.set(
+            privateRef,
+            {
+              shazifyProductId: productDoc.id,
+              markazSku,
+              updatedAt: new Date(),
+            },
+            { merge: true }
+          );
+
+          batch.update(
+            doc(db, "products", productDoc.id),
+            {
+              sku: deleteField(),
+            }
+          );
+
+          privateSkuMap.set(productDoc.id, {
+            ...existingPrivateData,
+            shazifyProductId: productDoc.id,
+            markazSku,
+          });
+        });
+
+        await batch.commit();
+      }
+
+      const productsData = productsSnapshot.docs.map(
+        (productDoc) => {
+          const data = productDoc.data();
+          const privateData = privateSkuMap.get(productDoc.id);
+
+          return {
+            id: productDoc.id,
+            ...data,
+            sku: privateData?.markazSku || "",
+          };
+        }
+      );
 
       setProducts(productsData);
-    } catch (error) {
-      console.error(error);
-    }
 
-     setProductsLoading(false);
+    } catch (error) {
+      console.error("Fetch products error:", error);
+      alert(
+        "Products could not be loaded. Please check Firestore permissions."
+      );
+    } finally {
+      setProductsLoading(false);
+    }
   };
 
   fetchProducts();
-}, []);
-  const handleDelete = async (id: string) => {
+}, [user, loading]);
+ const handleDelete = async (id: string) => {
   const confirmDelete = window.confirm(
     "Are you sure you want to delete this product?"
   );
@@ -71,29 +160,43 @@ useEffect(() => {
   if (!confirmDelete) return;
 
   try {
-   await deleteDoc(doc(db, "products", id));
+    const deletedProduct = products.find(
+      (product) => product.id === id
+    );
 
-const deletedProduct = products.find(
-  (product) => product.id === id
-);
+    const batch = writeBatch(db);
 
-await logActivity(
-  `Product Deleted: ${deletedProduct?.name || "Unknown Product"}`
-);
+    batch.delete(doc(db, "products", id));
+    batch.delete(doc(db, "privateProductData", id));
 
-setProducts(products.filter((product) => product.id !== id));
+    await batch.commit();
 
-alert("Product Deleted Successfully!");
+    await logActivity(
+      `Product Deleted: ${
+        deletedProduct?.name || "Unknown Product"
+      }`
+    );
+
+    setProducts((prev) =>
+      prev.filter((product) => product.id !== id)
+    );
+
+    alert("Product Deleted Successfully!");
+
   } catch (error) {
-    console.error(error);
+    console.error("Delete product error:", error);
+    alert("Failed to delete product.");
   }
 };
 const filteredProducts = useMemo(() => {
   return products
     .filter((product: any) => {
-      const matchesSearch = product.name
-        .toLowerCase()
-        .includes(search.toLowerCase());
+     const searchTerm = search.trim().toLowerCase();
+
+const matchesSearch =
+  (product.name || "").toLowerCase().includes(searchTerm) ||
+  (product.sku || "").toLowerCase().includes(searchTerm) ||
+  (product.id || "").toLowerCase().includes(searchTerm);
 
       const matchesCategory =
         categoryFilter === "All" ||
@@ -156,6 +259,9 @@ const currentProducts =
 const totalPages = Math.ceil(
   filteredProducts.length / productsPerPage
 );
+useEffect(() => {
+  setCurrentPage(1);
+}, [search, categoryFilter, stockFilter, sortOption]);
 return (
     <>
       <Navbar />
@@ -187,7 +293,7 @@ return (
   <input
     
     type="text"
-    placeholder="Search products..."
+    placeholder="Search by Name, Markaz SKU or Shazify Product ID..."
     value={search}
     onChange={(e) => setSearch(e.target.value)}
     className="w-full md:w-96 border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-500"
@@ -245,6 +351,8 @@ return (
       <tr className="bg-pink-100">
         <th className="p-3 text-left">Image</th>
         <th className="p-3 text-left">Product</th>
+        <th className="p-3 text-left">Shazify Product ID</th>
+        <th className="p-3 text-left">Markaz SKU</th>
         <th className="p-3 text-left">Category</th>
         <th className="p-3 text-left">Price</th>
         <th className="p-3 text-left">Rating</th>
@@ -265,13 +373,23 @@ return (
             />
           </td>
 
-          <td className="p-3 font-semibold">
-            {product.name}
-          </td>
+         <td className="p-3 font-semibold">
+  {product.name}
+</td>
 
-          <td className="p-3">
-            {product.category}
-          </td>
+{/* Shazify Product ID */}
+<td className="p-3 text-xs font-mono">
+  {product.id}
+</td>
+
+{/* Markaz SKU */}
+<td className="p-3 text-sm font-mono">
+  {product.sku || "—"}
+</td>
+
+<td className="p-3">
+  {product.category}
+</td>
 
          <td className="p-3 text-pink-600 font-bold">
            {formatPrice(product.price, "PKR")}
