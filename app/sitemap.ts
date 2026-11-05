@@ -67,7 +67,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       products
         .map((product) => product.category)
         .filter(Boolean)
-        .map((category) => String(category).trim().toLowerCase())
+        .map((category) =>
+  String(category)
+    .trim()
+    .toLowerCase()
+    .replace(/\s*&\s*/g, " & ")
+    .replace(/\s+/g, " ")
+)
     ),
   ];
 
