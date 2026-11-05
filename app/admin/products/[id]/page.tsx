@@ -265,6 +265,7 @@ batch.update(productRef, {
   stock: Number(stock),
 
   isDeal,
+  updatedAt: new Date(),
 
   // Remove old public SKU
   sku: deleteField(),

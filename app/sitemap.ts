@@ -3,6 +3,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "./lib/firebase";
 
 const SITE_URL = "https://www.shazify.shop";
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
@@ -43,16 +44,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const products = snapshot.docs.map((doc) => {
     const data = doc.data();
 
-    return {
+     return {
       id: doc.id,
       category: data.category,
       createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
     };
   });
 
   const productPages: MetadataRoute.Sitemap = products.map((product) => ({
     url: `${SITE_URL}/product/${product.id}`,
-    lastModified: product.createdAt?.toDate?.() ?? undefined,
+    lastModified:
+  product.updatedAt?.toDate?.() ??
+  product.createdAt?.toDate?.() ??
+  undefined,
     changeFrequency: "weekly",
     priority: 0.8,
   }));

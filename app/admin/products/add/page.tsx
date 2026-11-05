@@ -240,6 +240,7 @@ batch.set(productRef, {
   isDeal,
 
   createdAt: new Date(),
+  updatedAt: new Date(),
 });
 
 // Private data: Admin only
