@@ -21,6 +21,7 @@ export const metadata: Metadata = {
     "online shopping",
   ],
 };
+export const dynamic = "force-dynamic";
 
 export default function Home() {
   return (
