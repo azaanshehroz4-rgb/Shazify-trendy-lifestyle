@@ -91,23 +91,30 @@ export default function RefundPage() {
             </p>
           </section>
 
-          <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">
-              4. Return Period
-            </h2>
+          ```jsx
+<section>
+  <h2 className="text-2xl font-bold text-gray-900 mb-3">
+    4. Return Period
+  </h2>
 
-            <p>
-              Return requests for products purchased directly from Shazify
-              should be submitted within the return period communicated with
-              the relevant product or order.
-            </p>
+  <p>
+    Customers may request a return or refund for products purchased
+    directly from Shazify within 3 days of receiving their order.
+  </p>
 
-            <p className="mt-3">
-              Customers should contact Shazify as soon as possible after
-              receiving an order if there is a problem with the product.
-            </p>
-          </section>
+  <p className="mt-3">
+    Return requests submitted after the 3-day return period may not
+    be accepted, except where required by applicable law or
+    specifically approved by Shazify.
+  </p>
 
+  <p className="mt-3">
+    Customers should contact Shazify as soon as possible after
+    receiving their order if they experience any product-related
+    issues.
+  </p>
+</section>
+```
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">
               5. Product Condition for Returns

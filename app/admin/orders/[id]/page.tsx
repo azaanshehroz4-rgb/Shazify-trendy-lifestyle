@@ -4,9 +4,13 @@ import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "../../../lib/firebase";
-import { updateDoc } from "firebase/firestore";
 import { useAuth } from "../../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { logActivity } from "../../../lib/activityLogger";
@@ -63,20 +67,35 @@ const updateStatus = async (status: string) => {
   try {
     const orderRef = doc(db, "orders", order.id);
 
-    await updateDoc(orderRef, {
+    const updateData: any = {
       status,
-    });
-    await logActivity(
-  `Order ${order.id.slice(0, 8)} status changed to ${status}`
-);
+    };
 
-    setOrder({
-      ...order,
-      status,
-    });
+    // Save delivery date only once
+    if (status === "Delivered" && !order.deliveredAt) {
+      updateData.deliveredAt = serverTimestamp();
+    }
+
+    await updateDoc(orderRef, updateData);
+
+    const updatedSnap = await getDoc(orderRef);
+
+    if (updatedSnap.exists()) {
+      setOrder({
+        id: updatedSnap.id,
+        ...updatedSnap.data(),
+      });
+    }
+
+    await logActivity(
+      `Order ${order.id.slice(0, 8)} status changed to ${status}`
+    );
+
+    alert("Order status updated successfully!");
 
   } catch (error) {
     console.error(error);
+    alert("Failed to update order status.");
   }
 };
 const saveTrackingInfo = async () => {

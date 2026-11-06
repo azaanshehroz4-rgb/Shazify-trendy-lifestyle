@@ -7,11 +7,13 @@ import { useEffect, useState } from "react";
 import {
   collection,
   getDocs,
+  getDoc,
   query,
   orderBy,
   updateDoc,
-   deleteDoc,
+  deleteDoc,
   doc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import Link from "next/link";
@@ -72,24 +74,45 @@ const updateOrderStatus = async (
   status: string
 ) => {
   try {
-    await updateDoc(doc(db, "orders", orderId), {
-      status,
-    });
-    await logActivity(
-  `Order ${orderId.slice(0, 8)} status changed to ${status}`
-);
+    const orderRef = doc(db, "orders", orderId);
 
-    setOrders((prev: any[]) =>
-      prev.map((order) =>
-        order.id === orderId
-          ? { ...order, status }
-          : order
-      )
+    const existingOrder = orders.find(
+      (order: any) => order.id === orderId
+    );
+
+    const updateData: any = { status };
+
+    // Delivery date sirf pehli baar Delivered hone par save hogi
+    if (status === "Delivered" && !existingOrder?.deliveredAt) {
+      updateData.deliveredAt = serverTimestamp();
+    }
+
+    await updateDoc(orderRef, updateData);
+
+    // Updated order Firestore se dobara load karein
+    const updatedSnapshot = await getDoc(orderRef);
+
+    if (updatedSnapshot.exists()) {
+      setOrders((prev: any[]) =>
+        prev.map((order) =>
+          order.id === orderId
+            ? {
+                id: updatedSnapshot.id,
+                ...updatedSnapshot.data(),
+              }
+            : order
+        )
+      );
+    }
+
+    await logActivity(
+      `Order ${orderId.slice(0, 8)} status changed to ${status}`
     );
 
     alert("Order status updated successfully!");
   } catch (error) {
-    console.error(error);
+    console.error("Update order status error:", error);
+    alert("Failed to update order status.");
   }
 };
 
