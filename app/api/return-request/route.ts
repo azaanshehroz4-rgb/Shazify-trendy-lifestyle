@@ -90,6 +90,33 @@ export async function POST(req: Request) {
         );
       }
     }
+        // Only Shazify direct-sale products are eligible for returns
+    const products = Array.isArray(order.products)
+      ? order.products
+      : [];
+
+    if (products.length === 0) {
+      return NextResponse.json(
+        { error: "No products were found in this order." },
+        { status: 400 }
+      );
+    }
+
+   const hasIneligibleProduct = products.some((product: any) => {
+  const affiliateLink = String(product.affiliateLink || "").trim();
+
+  return affiliateLink !== "";
+});
+
+    if (hasIneligibleProduct) {
+      return NextResponse.json(
+        {
+          error:
+            "This order contains an affiliate or partner product. Please follow the original seller's return policy.",
+        },
+        { status: 400 }
+      );
+    }
 
     // Only delivered orders are eligible
     if (order.status !== "Delivered") {

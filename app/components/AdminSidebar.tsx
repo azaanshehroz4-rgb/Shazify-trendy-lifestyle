@@ -32,6 +32,11 @@ export default function AdminSidebar() {
       href: "/admin/questions",
       icon: "❓",
     },
+    {
+  name: "Return Requests",
+  href: "/admin/return-requests",
+  icon: "↩️",
+},
   ];
 
   return (
