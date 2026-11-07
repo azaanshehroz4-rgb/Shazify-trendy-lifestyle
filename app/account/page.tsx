@@ -145,6 +145,17 @@ if (!user) {
   </div>
 </Link>
 
+<Link href="/account/returns">
+  <div className="border rounded-xl p-6 hover:shadow-lg transition cursor-pointer">
+    <div className="text-3xl">↩️</div>
+    <h3 className="text-xl font-bold mt-4">My Returns</h3>
+    <p className="text-gray-500 mt-2">
+      View the status of your return requests.
+    </p>
+  </div>
+</Link>
+
+
 <Link href="/track-order">
 
 
